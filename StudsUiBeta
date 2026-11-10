@@ -11,22 +11,24 @@ function Library.Load(options)
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+    -- Xóa UI cũ nếu có
     if PlayerGui:FindFirstChild("ModularStudsUI") then
         PlayerGui.ModularStudsUI:Destroy()
     end
 
+    -- 1. ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "ModularStudsUI"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = PlayerGui
 
-    -- Nút bật/tắt menu hình quả ớt
+    -- 2. Floating Toggle Button (Nút tròn mở/đóng UI - thay ảnh quả ớt)
     local ToggleButton = Instance.new("ImageButton")
     ToggleButton.Name = "ToggleButton"
     ToggleButton.Size = UDim2.new(0, 44, 0, 44)
     ToggleButton.Position = UDim2.new(0, 20, 0, 150)
-    ToggleButton.Image = "rbxassetid://11686708746"
+    ToggleButton.Image = "rbxassetid://11686708746" -- ID ảnh quả ớt mẫu trên Roblox (hoặc thay ID của bạn vào đây)
     ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 20)
     ToggleButton.Active = true
     ToggleButton.Draggable = true
@@ -41,7 +43,7 @@ function Library.Load(options)
     ToggleStroke.Thickness = 2
     ToggleStroke.Parent = ToggleButton
 
-    -- Khung UI chính
+    -- 3. Main Frame
     local MainFrame = Instance.new("ImageLabel")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 480, 0, 310)
@@ -49,7 +51,7 @@ function Library.Load(options)
     MainFrame.Image = "rbxassetid://108414675268122"
     MainFrame.ScaleType = Enum.ScaleType.Tile
     MainFrame.TileSize = UDim2.new(0, 35, 0, 35)
-    MainFrame.ImageColor3 = Color3.fromRGB(91, 186, 63)
+    MainFrame.ImageColor3 = Color3.fromRGB(91, 186, 63) -- Đổi ImageColor3 theo yêu cầu
     MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 15)
     MainFrame.ClipsDescendants = true
     MainFrame.Active = true
@@ -65,31 +67,43 @@ function Library.Load(options)
     MainStroke.Thickness = 1.5
     MainStroke.Parent = MainFrame
 
-    -- UIGradient chuẩn cú pháp
+    -- Thêm UIGradient cho MainFrame theo thông số bạn cung cấp
     local MainGradient = Instance.new("UIGradient")
     MainGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(91, 186, 63))
+        MainGradient.Color = ColorSequence.new(Color3.fromRGB(91, 186, 63))
     })
+    -- Các điểm chuyển màu và độ trong suốt (Transparency)
     MainGradient.Transparency = NumberSequence.new({
         NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(1, 0),
+        NumberSequenceKeypoint.new(0.0156863, 1),
+        NumberSequenceKeypoint.new(0, 0)
+    })
+    -- Sửa lại cú pháp Sequence chuẩn cho các điểm dừng theo yêu cầu: 
+    MainGradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(1, 0),
         NumberSequenceKeypoint.new(0.0156863, 1),
         NumberSequenceKeypoint.new(1, 0)
     })
     MainGradient.Parent = MainFrame
 
+    -- Overlay tối nền
     local Overlay = Instance.new("Frame")
     Overlay.Size = UDim2.new(1, 0, 1, 0)
     Overlay.BackgroundColor3 = Color3.fromRGB(10, 15, 12)
     Overlay.BackgroundTransparency = 0.4
     Overlay.Parent = MainFrame
 
+    -- Font chữ
     local CustomFont = Font.new(
         "rbxasset://fonts/families/ComicNeueAngular.json",
         Enum.FontWeight.Bold,
         Enum.FontStyle.Normal
     )
 
+    -- TopBar
     local TopBar = Instance.new("Frame")
     TopBar.Size = UDim2.new(1, 0, 0, 35)
     TopBar.BackgroundTransparency = 1
@@ -120,6 +134,7 @@ function Library.Load(options)
     CloseCorner.CornerRadius = UDim.new(0, 5)
     CloseCorner.Parent = CloseBtn
 
+    -- Tab Bar (Danh sách các Tab chuyển trang)
     local TabBarContainer = Instance.new("ScrollingFrame")
     TabBarContainer.Size = UDim2.new(0, 110, 1, -45)
     TabBarContainer.Position = UDim2.new(0, 8, 0, 40)
@@ -134,6 +149,7 @@ function Library.Load(options)
     TabBarLayout.Padding = UDim.new(0, 5)
     TabBarLayout.Parent = TabBarContainer
 
+    -- Đường kẻ dọc chia Tab và Nội dung
     local Divider = Instance.new("Frame")
     Divider.Size = UDim2.new(0, 1, 1, -50)
     Divider.Position = UDim2.new(0, 125, 0, 45)
@@ -141,10 +157,12 @@ function Library.Load(options)
     Divider.BorderSizePixel = 0
     Divider.Parent = MainFrame
 
+    -- Pages Container
     local PagesContainer = Instance.new("Folder")
     PagesContainer.Name = "PagesContainer"
     PagesContainer.Parent = MainFrame
 
+    -- Logic Ẩn/Hiện UI
     local isOpen = true
     ToggleButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
@@ -155,6 +173,7 @@ function Library.Load(options)
         MainFrame.Visible = false
     end)
 
+    -- API Object
     local Window = {}
 
     function Window:CreateTab(tabName)
@@ -248,7 +267,9 @@ function Library.Load(options)
             btn.Parent = btnFrame
 
             btn.MouseButton1Click:Connect(function()
-                if callback then pcall(callback) end
+                if callback then 
+                    pcall(callback)
+                end
             end)
         end
 
