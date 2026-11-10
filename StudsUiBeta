@@ -1,0 +1,442 @@
+local Library = {}
+
+function Library.Load(options)
+    options = options or {}
+    local title = options.Title or "UI Library"
+    
+    local TweenService = game:GetService("TweenService")
+    local UserInputService = game:GetService("UserInputService")
+    local Players = game:GetService("Players")
+
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Xóa UI cũ nếu có
+    if PlayerGui:FindFirstChild("ModularStudsUI") then
+        PlayerGui.ModularStudsUI:Destroy()
+    end
+
+    -- 1. ScreenGui
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ModularStudsUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.Parent = PlayerGui
+
+    -- 2. Floating Toggle Button (Nút tròn mở/đóng UI)
+    local ToggleButton = Instance.new("ImageButton")
+    ToggleButton.Name = "ToggleButton"
+    ToggleButton.Size = UDim2.new(0, 44, 0, 44)
+    ToggleButton.Position = UDim2.new(0, 20, 0, 150)
+    ToggleButton.Image = "rbxassetid://108414675268122"
+    ToggleButton.ScaleType = Enum.ScaleType.Tile
+    ToggleButton.TileSize = UDim2.new(0, 20, 0, 20)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 25, 15)
+    ToggleButton.Active = true
+    ToggleButton.Draggable = true
+    ToggleButton.Parent = ScreenGui
+
+    local ToggleCorner = Instance.new("UICorner")
+    ToggleCorner.CornerRadius = UDim.new(1, 0)
+    ToggleCorner.Parent = ToggleButton
+
+    local ToggleStroke = Instance.new("UIStroke")
+    ToggleStroke.Color = Color3.fromRGB(0, 230, 115)
+    ToggleStroke.Thickness = 2
+    ToggleStroke.Parent = ToggleButton
+
+    -- 3. Main Frame
+    local MainFrame = Instance.new("ImageLabel")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 480, 0, 310)
+    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -155)
+    MainFrame.Image = "rbxassetid://108414675268122"
+    MainFrame.ScaleType = Enum.ScaleType.Tile
+    MainFrame.TileSize = UDim2.new(0, 35, 0, 35)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 15)
+    MainFrame.ClipsDescendants = true
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.Parent = MainFrame
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = Color3.fromRGB(0, 200, 100)
+    MainStroke.Thickness = 1.5
+    MainStroke.Parent = MainFrame
+
+    -- Overlay tối nền
+    local Overlay = Instance.new("Frame")
+    Overlay.Size = UDim2.new(1, 0, 1, 0)
+    Overlay.BackgroundColor3 = Color3.fromRGB(10, 15, 12)
+    Overlay.BackgroundTransparency = 0.4
+    Overlay.Parent = MainFrame
+
+    -- Font chữ
+    local CustomFont = Font.new(
+        "rbxasset://fonts/families/ComicNeueAngular.json",
+        Enum.FontWeight.Bold,
+        Enum.FontStyle.Normal
+    )
+
+    -- TopBar
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 35)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = MainFrame
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -50, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = title
+    TitleLabel.FontFace = CustomFont
+    TitleLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
+    TitleLabel.TextSize = 15
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = TopBar
+
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+    CloseBtn.Position = UDim2.new(1, -28, 0.5, -12)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 50, 35)
+    CloseBtn.Text = "X"
+    CloseBtn.FontFace = CustomFont
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+    CloseBtn.TextSize = 12
+    CloseBtn.Parent = TopBar
+
+    local CloseCorner = Instance.new("UICorner")
+    CloseCorner.CornerRadius = UDim.new(0, 5)
+    CloseCorner.Parent = CloseBtn
+
+    -- Tab Bar (Danh sách các Tab chuyển trang)
+    local TabBarContainer = Instance.new("ScrollingFrame")
+    TabBarContainer.Size = UDim2.new(0, 110, 1, -45)
+    TabBarContainer.Position = UDim2.new(0, 8, 0, 40)
+    TabBarContainer.BackgroundTransparency = 1
+    TabBarContainer.BorderSizePixel = 0
+    TabBarContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabBarContainer.ScrollBarThickness = 0
+    TabBarContainer.Parent = MainFrame
+
+    local TabBarLayout = Instance.new("UIListLayout")
+    TabBarLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabBarLayout.Padding = UDim.new(0, 5)
+    TabBarLayout.Parent = TabBarContainer
+
+    -- Đường kẻ dọc chia Tab và Nội dung
+    local Divider = Instance.new("Frame")
+    Divider.Size = UDim2.new(0, 1, 1, -50)
+    Divider.Position = UDim2.new(0, 125, 0, 45)
+    Divider.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
+    Divider.BorderSizePixel = 0
+    Divider.Parent = MainFrame
+
+    -- Pages Container (Khu vực chứa các nội dung của Tab)
+    local PagesContainer = Instance.new("Folder")
+    PagesContainer.Name = "PagesContainer"
+    PagesContainer.Parent = MainFrame
+
+    -- Logic Ẩn/Hiện UI
+    local isOpen = true
+    ToggleButton.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        MainFrame.Visible = isOpen
+    end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        isOpen = false
+        MainFrame.Visible = false
+    end)
+
+    -- API Object để người dùng thêm Tab và Component dễ dàng
+    local Window = {}
+
+    function Window:CreateTab(tabName)
+        local Tab = {}
+
+        -- Nút bấm chuyển Tab trên Sidebar
+        local TabButton = Instance.new("TextButton")
+        TabButton.Size = UDim2.new(1, 0, 0, 32)
+        TabButton.BackgroundColor3 = Color3.fromRGB(20, 32, 24)
+        TabButton.BackgroundTransparency = 0.5
+        TabButton.Text = "  " .. tabName
+        TabButton.FontFace = CustomFont
+        TabButton.TextColor3 = Color3.fromRGB(180, 220, 190)
+        TabButton.TextSize = 13
+        TabButton.TextXAlignment = Enum.TextXAlignment.Left
+        TabButton.Parent = TabBarContainer
+
+        local TabBtnCorner = Instance.new("UICorner")
+        TabBtnCorner.CornerRadius = UDim.new(0, 5)
+        TabBtnCorner.Parent = TabButton
+
+        -- Khung chứa nội dung riêng của Tab đó
+        local TabPage = Instance.new("ScrollingFrame")
+        TabPage.Size = UDim2.new(1, -135, 1, -45)
+        TabPage.Position = UDim2.new(0, 132, 0, 40)
+        TabPage.BackgroundTransparency = 1
+        TabPage.BorderSizePixel = 0
+        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabPage.ScrollBarThickness = 3
+        TabPage.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 100)
+        TabPage.Visible = false
+        TabPage.Parent = PagesContainer
+
+        local PageLayout = Instance.new("UIListLayout")
+        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        PageLayout.Padding = UDim.new(0, 6)
+        PageLayout.Parent = TabPage
+
+        -- Tự động cập nhật kích thước cuộn (CanvasSize)
+        PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            TabPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 10)
+        end)
+
+        -- Hàm chuyển Tab (Ẩn hết các tab khác, hiện tab này)
+        TabButton.MouseButton1Click:Connect(function()
+            for _, page in ipairs(PagesContainer:GetChildren()) do
+                page.Visible = false
+            end
+            for _, btn in ipairs(TabBarContainer:GetChildren()) do
+                if btn:IsA("TextButton") then
+                    btn.TextColor3 = Color3.fromRGB(180, 220, 190)
+                    btn.BackgroundTransparency = 0.5
+                end
+            end
+            TabPage.Visible = true
+            TabButton.TextColor3 = Color3.fromRGB(0, 255, 128)
+            TabButton.BackgroundTransparency = 0.2
+        end)
+
+        -- Nếu là tab đầu tiên thì cho hiển thị mặc định luôn
+        if #PagesContainer:GetChildren() == 1 then
+            TabPage.Visible = true
+            TabButton.TextColor3 = Color3.fromRGB(0, 255, 128)
+            TabButton.BackgroundTransparency = 0.2
+        end
+
+        -- Hàm tạo khung thành phần con chung
+        local function createContainer(sizeY)
+            local frame = Instance.new("Frame")
+            frame.Size = UDim2.new(1, 0, 0, sizeY)
+            frame.BackgroundColor3 = Color3.fromRGB(20, 32, 24)
+            frame.BackgroundTransparency = 0.3
+            
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 5)
+            corner.Parent = frame
+            
+            local stroke = Instance.new("UIStroke")
+            stroke.Color = Color3.fromRGB(0, 150, 75)
+            stroke.Thickness = 1
+            stroke.Parent = frame
+            
+            return frame
+        end
+
+        -- 1. Nút bấm (Button)
+        function Tab:AddButton(text, callback)
+            local btnFrame = createContainer(32)
+            btnFrame.Parent = TabPage
+
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 1, 0)
+            btn.BackgroundTransparency = 1
+            btn.Text = text
+            btn.FontFace = CustomFont
+            btn.TextColor3 = Color3.fromRGB(230, 255, 230)
+            btn.TextSize = 13
+            btn.Parent = btnFrame
+
+            btn.MouseButton1Click:Connect(function()
+                if callback then 
+                    local success, err = pcall(callback)
+                    if not success then warn("UI Callback Error: " .. tostring(err)) end
+                end
+            end)
+        end
+
+        -- 2. Công tắc (Toggle On/Off)
+        function Tab:AddToggle(text, defaultState, callback)
+            local toggled = defaultState or false
+            local toggleFrame = createContainer(32)
+            toggleFrame.Parent = TabPage
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.7, 0, 1, 0)
+            label.Position = UDim2.new(0, 10, 0, 0)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 13
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = toggleFrame
+
+            local switchBg = Instance.new("Frame")
+            switchBg.Size = UDim2.new(0, 32, 0, 16)
+            switchBg.Position = UDim2.new(1, -42, 0.5, -8)
+            switchBg.BackgroundColor3 = toggled and Color3.fromRGB(0, 210, 105) or Color3.fromRGB(40, 60, 45)
+            switchBg.Parent = toggleFrame
+
+            local switchCorner = Instance.new("UICorner")
+            switchCorner.CornerRadius = UDim.new(1, 0)
+            switchCorner.Parent = switchBg
+
+            local circle = Instance.new("Frame")
+            circle.Size = UDim2.new(0, 12, 0, 12)
+            circle.Position = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
+            circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            circle.Parent = switchBg
+
+            local circleCorner = Instance.new("UICorner")
+            circleCorner.CornerRadius = UDim.new(1, 0)
+            circleCorner.Parent = circle
+
+            local clickBtn = Instance.new("TextButton")
+            clickBtn.Size = UDim2.new(1, 0, 1, 0)
+            clickBtn.BackgroundTransparency = 1
+            clickBtn.Text = ""
+            clickBtn.Parent = toggleFrame
+
+            clickBtn.MouseButton1Click:Connect(function()
+                toggled = not toggled
+                local targetPos = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
+                local targetColor = toggled and Color3.fromRGB(0, 210, 105) or Color3.fromRGB(40, 60, 45)
+
+                TweenService:Create(circle, TweenInfo.new(0.15), {Position = targetPos}):Play()
+                TweenService:Create(switchBg, TweenInfo.new(0.15), {BackgroundColor3 = targetColor}):Play()
+
+                if callback then callback(toggled) end
+            end)
+        end
+
+        -- 3. Thanh kéo (Slider)
+        function Tab:AddSlider(text, min, max, default, callback)
+            local value = default or min
+            local sliderFrame = createContainer(40)
+            sliderFrame.Parent = TabPage
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.6, 0, 0, 18)
+            label.Position = UDim2.new(0, 10, 0, 3)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 12
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = sliderFrame
+
+            local valLabel = Instance.new("TextLabel")
+            valLabel.Size = UDim2.new(0.3, 0, 0, 18)
+            valLabel.Position = UDim2.new(0.7, -10, 0, 3)
+            valLabel.BackgroundTransparency = 1
+            valLabel.Text = tostring(value)
+            valLabel.FontFace = CustomFont
+            valLabel.TextColor3 = Color3.fromRGB(150, 220, 170)
+            valLabel.TextSize = 12
+            valLabel.TextXAlignment = Enum.TextXAlignment.Right
+            valLabel.Parent = sliderFrame
+
+            local track = Instance.new("Frame")
+            track.Size = UDim2.new(1, -20, 0, 5)
+            track.Position = UDim2.new(0, 10, 0, 25)
+            track.BackgroundColor3 = Color3.fromRGB(30, 45, 35)
+            track.Parent = sliderFrame
+
+            local trackCorner = Instance.new("UICorner")
+            trackCorner.CornerRadius = UDim.new(1, 0)
+            trackCorner.Parent = track
+
+            local fill = Instance.new("Frame")
+            fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
+            fill.BackgroundColor3 = Color3.fromRGB(0, 210, 105)
+            fill.Parent = track
+
+            local fillCorner = Instance.new("UICorner")
+            fillCorner.CornerRadius = UDim.new(1, 0)
+            fillCorner.Parent = fill
+
+            local dragging = false
+            local function update(input)
+                local pos = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+                local currentVal = math.floor(min + ((max - min) * pos))
+                valLabel.Text = tostring(currentVal)
+                fill.Size = UDim2.new(pos, 0, 1, 0)
+                if callback then callback(currentVal) end
+            end
+
+            sliderFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = true
+                    update(input)
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = false
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    update(input)
+                end
+            end)
+        end
+
+        -- 4. Khung nhập văn bản (Textbox)
+        function Tab:AddTextbox(text, placeholder, callback)
+            local boxFrame = createContainer(32)
+            boxFrame.Parent = TabPage
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.5, 0, 1, 0)
+            label.Position = UDim2.new(0, 10, 0, 0)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 13
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = boxFrame
+
+            local boxContainer = Instance.new("Frame")
+            boxContainer.Size = UDim2.new(0.45, 0, 0, 22)
+            boxContainer.Position = UDim2.new(0.55, -10, 0.5, -11)
+            boxContainer.BackgroundColor3 = Color3.fromRGB(15, 25, 18)
+            boxContainer.Parent = boxFrame
+
+            local boxCorner = Instance.new("UICorner")
+            boxCorner.CornerRadius = UDim.new(0, 4)
+            boxCorner.Parent = boxContainer
+
+            local textBox = Instance.new("TextBox")
+            textBox.Size = UDim2.new(1, -8, 1, 0)
+            textBox.Position = UDim2.new(0, 4, 0, 0)
+            textBox.BackgroundTransparency = 1
+            textBox.PlaceholderText = placeholder or "..."
+            textBox.Text = ""
+            textBox.FontFace = CustomFont
+            textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            textBox.PlaceholderColor3 = Color3.fromRGB(100, 150, 110)
+            textBox.TextSize = 12
+            textBox.ClearTextOnFocus = false
+            textBox.Parent = boxContainer
+
+            textBox.FocusLost:Connect(function(enterPressed)
+                if callback then callback(textBox.Text, enterPressed) end
+            end)
+        end
+
+        return Tab
+    end
+
+    return Window
+end
+
+return Library
