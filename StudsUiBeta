@@ -23,15 +23,13 @@ function Library.Load(options)
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = PlayerGui
 
-    -- 2. Floating Toggle Button (Nút tròn mở/đóng UI)
+    -- 2. Floating Toggle Button (Nút tròn mở/đóng UI - thay ảnh quả ớt)
     local ToggleButton = Instance.new("ImageButton")
     ToggleButton.Name = "ToggleButton"
     ToggleButton.Size = UDim2.new(0, 44, 0, 44)
     ToggleButton.Position = UDim2.new(0, 20, 0, 150)
-    ToggleButton.Image = "rbxassetid://108414675268122"
-    ToggleButton.ScaleType = Enum.ScaleType.Tile
-    ToggleButton.TileSize = UDim2.new(0, 20, 0, 20)
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 25, 15)
+    ToggleButton.Image = "rbxassetid://11686708746" -- ID ảnh quả ớt mẫu trên Roblox (hoặc thay ID của bạn vào đây)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 20)
     ToggleButton.Active = true
     ToggleButton.Draggable = true
     ToggleButton.Parent = ScreenGui
@@ -41,7 +39,7 @@ function Library.Load(options)
     ToggleCorner.Parent = ToggleButton
 
     local ToggleStroke = Instance.new("UIStroke")
-    ToggleStroke.Color = Color3.fromRGB(0, 230, 115)
+    ToggleStroke.Color = Color3.fromRGB(91, 186, 63)
     ToggleStroke.Thickness = 2
     ToggleStroke.Parent = ToggleButton
 
@@ -53,6 +51,7 @@ function Library.Load(options)
     MainFrame.Image = "rbxassetid://108414675268122"
     MainFrame.ScaleType = Enum.ScaleType.Tile
     MainFrame.TileSize = UDim2.new(0, 35, 0, 35)
+    MainFrame.ImageColor3 = Color3.fromRGB(91, 186, 63) -- Đổi ImageColor3 theo yêu cầu
     MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 15)
     MainFrame.ClipsDescendants = true
     MainFrame.Active = true
@@ -64,9 +63,31 @@ function Library.Load(options)
     MainCorner.Parent = MainFrame
 
     local MainStroke = Instance.new("UIStroke")
-    MainStroke.Color = Color3.fromRGB(0, 200, 100)
+    MainStroke.Color = Color3.fromRGB(91, 186, 63)
     MainStroke.Thickness = 1.5
     MainStroke.Parent = MainFrame
+
+    -- Thêm UIGradient cho MainFrame theo thông số bạn cung cấp
+    local MainGradient = Instance.new("UIGradient")
+    MainGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+        MainGradient.Color = ColorSequence.new(Color3.fromRGB(91, 186, 63))
+    })
+    -- Các điểm chuyển màu và độ trong suốt (Transparency)
+    MainGradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(1, 0),
+        NumberSequenceKeypoint.new(0.0156863, 1),
+        NumberSequenceKeypoint.new(0, 0)
+    })
+    -- Sửa lại cú pháp Sequence chuẩn cho các điểm dừng theo yêu cầu: 
+    MainGradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.6),
+        NumberSequenceKeypoint.new(1, 0),
+        NumberSequenceKeypoint.new(0.0156863, 1),
+        NumberSequenceKeypoint.new(1, 0)
+    })
+    MainGradient.Parent = MainFrame
 
     -- Overlay tối nền
     local Overlay = Instance.new("Frame")
@@ -94,7 +115,7 @@ function Library.Load(options)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = title
     TitleLabel.FontFace = CustomFont
-    TitleLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
+    TitleLabel.TextColor3 = Color3.fromRGB(91, 186, 63)
     TitleLabel.TextSize = 15
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TopBar
@@ -132,11 +153,11 @@ function Library.Load(options)
     local Divider = Instance.new("Frame")
     Divider.Size = UDim2.new(0, 1, 1, -50)
     Divider.Position = UDim2.new(0, 125, 0, 45)
-    Divider.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
+    Divider.BackgroundColor3 = Color3.fromRGB(91, 186, 63)
     Divider.BorderSizePixel = 0
     Divider.Parent = MainFrame
 
-    -- Pages Container (Khu vực chứa các nội dung của Tab)
+    -- Pages Container
     local PagesContainer = Instance.new("Folder")
     PagesContainer.Name = "PagesContainer"
     PagesContainer.Parent = MainFrame
@@ -152,13 +173,12 @@ function Library.Load(options)
         MainFrame.Visible = false
     end)
 
-    -- API Object để người dùng thêm Tab và Component dễ dàng
+    -- API Object
     local Window = {}
 
     function Window:CreateTab(tabName)
         local Tab = {}
 
-        -- Nút bấm chuyển Tab trên Sidebar
         local TabButton = Instance.new("TextButton")
         TabButton.Size = UDim2.new(1, 0, 0, 32)
         TabButton.BackgroundColor3 = Color3.fromRGB(20, 32, 24)
@@ -174,7 +194,6 @@ function Library.Load(options)
         TabBtnCorner.CornerRadius = UDim.new(0, 5)
         TabBtnCorner.Parent = TabButton
 
-        -- Khung chứa nội dung riêng của Tab đó
         local TabPage = Instance.new("ScrollingFrame")
         TabPage.Size = UDim2.new(1, -135, 1, -45)
         TabPage.Position = UDim2.new(0, 132, 0, 40)
@@ -182,7 +201,7 @@ function Library.Load(options)
         TabPage.BorderSizePixel = 0
         TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
         TabPage.ScrollBarThickness = 3
-        TabPage.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 100)
+        TabPage.ScrollBarImageColor3 = Color3.fromRGB(91, 186, 63)
         TabPage.Visible = false
         TabPage.Parent = PagesContainer
 
@@ -191,12 +210,10 @@ function Library.Load(options)
         PageLayout.Padding = UDim.new(0, 6)
         PageLayout.Parent = TabPage
 
-        -- Tự động cập nhật kích thước cuộn (CanvasSize)
         PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             TabPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 10)
         end)
 
-        -- Hàm chuyển Tab (Ẩn hết các tab khác, hiện tab này)
         TabButton.MouseButton1Click:Connect(function()
             for _, page in ipairs(PagesContainer:GetChildren()) do
                 page.Visible = false
@@ -208,18 +225,16 @@ function Library.Load(options)
                 end
             end
             TabPage.Visible = true
-            TabButton.TextColor3 = Color3.fromRGB(0, 255, 128)
+            TabButton.TextColor3 = Color3.fromRGB(91, 186, 63)
             TabButton.BackgroundTransparency = 0.2
         end)
 
-        -- Nếu là tab đầu tiên thì cho hiển thị mặc định luôn
         if #PagesContainer:GetChildren() == 1 then
             TabPage.Visible = true
-            TabButton.TextColor3 = Color3.fromRGB(0, 255, 128)
+            TabButton.TextColor3 = Color3.fromRGB(91, 186, 63)
             TabButton.BackgroundTransparency = 0.2
         end
 
-        -- Hàm tạo khung thành phần con chung
         local function createContainer(sizeY)
             local frame = Instance.new("Frame")
             frame.Size = UDim2.new(1, 0, 0, sizeY)
@@ -231,14 +246,13 @@ function Library.Load(options)
             corner.Parent = frame
             
             local stroke = Instance.new("UIStroke")
-            stroke.Color = Color3.fromRGB(0, 150, 75)
+            stroke.Color = Color3.fromRGB(91, 186, 63)
             stroke.Thickness = 1
             stroke.Parent = frame
             
             return frame
         end
 
-        -- 1. Nút bấm (Button)
         function Tab:AddButton(text, callback)
             local btnFrame = createContainer(32)
             btnFrame.Parent = TabPage
@@ -254,13 +268,11 @@ function Library.Load(options)
 
             btn.MouseButton1Click:Connect(function()
                 if callback then 
-                    local success, err = pcall(callback)
-                    if not success then warn("UI Callback Error: " .. tostring(err)) end
+                    pcall(callback)
                 end
             end)
         end
 
-        -- 2. Công tắc (Toggle On/Off)
         function Tab:AddToggle(text, defaultState, callback)
             local toggled = defaultState or false
             local toggleFrame = createContainer(32)
@@ -269,6 +281,176 @@ function Library.Load(options)
             local label = Instance.new("TextLabel")
             label.Size = UDim2.new(0.7, 0, 1, 0)
             label.Position = UDim2.new(0, 10, 0, 0)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 13
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = toggleFrame
+
+            local switchBg = Instance.new("Frame")
+            switchBg.Size = UDim2.new(0, 32, 0, 16)
+            switchBg.Position = UDim2.new(1, -42, 0.5, -8)
+            switchBg.BackgroundColor3 = toggled and Color3.fromRGB(91, 186, 63) or Color3.fromRGB(40, 60, 45)
+            switchBg.Parent = toggleFrame
+
+            local switchCorner = Instance.new("UICorner")
+            switchCorner.CornerRadius = UDim.new(1, 0)
+            switchCorner.Parent = switchBg
+
+            local circle = Instance.new("Frame")
+            circle.Size = UDim2.new(0, 12, 0, 12)
+            circle.Position = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
+            circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            circle.Parent = switchBg
+
+            local circleCorner = Instance.new("UICorner")
+            circleCorner.CornerRadius = UDim.new(1, 0)
+            circleCorner.Parent = circle
+
+            local clickBtn = Instance.new("TextButton")
+            clickBtn.Size = UDim2.new(1, 0, 1, 0)
+            clickBtn.BackgroundTransparency = 1
+            clickBtn.Text = ""
+            clickBtn.Parent = toggleFrame
+
+            clickBtn.MouseButton1Click:Connect(function()
+                toggled = not toggled
+                local targetPos = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
+                local targetColor = toggled and Color3.fromRGB(91, 186, 63) or Color3.fromRGB(40, 60, 45)
+
+                TweenService:Create(circle, TweenInfo.new(0.15), {Position = targetPos}):Play()
+                TweenService:Create(switchBg, TweenInfo.new(0.15), {BackgroundColor3 = targetColor}):Play()
+
+                if callback then callback(toggled) end
+            end)
+        end
+
+        function Tab:AddSlider(text, min, max, default, callback)
+            local value = default or min
+            local sliderFrame = createContainer(40)
+            sliderFrame.Parent = TabPage
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.6, 0, 0, 18)
+            label.Position = UDim2.new(0, 10, 0, 3)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 12
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = sliderFrame
+
+            local valLabel = Instance.new("TextLabel")
+            valLabel.Size = UDim2.new(0.3, 0, 0, 18)
+            valLabel.Position = UDim2.new(0.7, -10, 0, 3)
+            valLabel.BackgroundTransparency = 1
+            valLabel.Text = tostring(value)
+            valLabel.FontFace = CustomFont
+            valLabel.TextColor3 = Color3.fromRGB(150, 220, 170)
+            valLabel.TextSize = 12
+            valLabel.TextXAlignment = Enum.TextXAlignment.Right
+            valLabel.Parent = sliderFrame
+
+            local track = Instance.new("Frame")
+            track.Size = UDim2.new(1, -20, 0, 5)
+            track.Position = UDim2.new(0, 10, 0, 25)
+            track.BackgroundColor3 = Color3.fromRGB(30, 45, 35)
+            track.Parent = sliderFrame
+
+            local trackCorner = Instance.new("UICorner")
+            trackCorner.CornerRadius = UDim.new(1, 0)
+            trackCorner.Parent = track
+
+            local fill = Instance.new("Frame")
+            fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
+            fill.BackgroundColor3 = Color3.fromRGB(91, 186, 63)
+            fill.Parent = track
+
+            local fillCorner = Instance.new("UICorner")
+            fillCorner.CornerRadius = UDim.new(1, 0)
+            fillCorner.Parent = fill
+
+            local dragging = false
+            local function update(input)
+                local pos = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+                local currentVal = math.floor(min + ((max - min) * pos))
+                valLabel.Text = tostring(currentVal)
+                fill.Size = UDim2.new(pos, 0, 1, 0)
+                if callback then callback(currentVal) end
+            end
+
+            sliderFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = true
+                    update(input)
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = false
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    update(input)
+                end
+            end)
+        end
+
+        function Tab:AddTextbox(text, placeholder, callback)
+            local boxFrame = createContainer(32)
+            boxFrame.Parent = TabPage
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.5, 0, 1, 0)
+            label.Position = UDim2.new(0, 10, 0, 0)
+            label.BackgroundTransparency = 1
+            label.Text = text
+            label.FontFace = CustomFont
+            label.TextColor3 = Color3.fromRGB(230, 255, 230)
+            label.TextSize = 13
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.Parent = boxFrame
+
+            local boxContainer = Instance.new("Frame")
+            boxContainer.Size = UDim2.new(0.45, 0, 0, 22)
+            boxContainer.Position = UDim2.new(0.55, -10, 0.5, -11)
+            boxContainer.BackgroundColor3 = Color3.fromRGB(15, 25, 18)
+            boxContainer.Parent = boxFrame
+
+            local boxCorner = Instance.new("UICorner")
+            boxCorner.CornerRadius = UDim.new(0, 4)
+            boxCorner.Parent = boxContainer
+
+            local textBox = Instance.new("TextBox")
+            textBox.Size = UDim2.new(1, -8, 1, 0)
+            textBox.Position = UDim2.new(0, 4, 0, 0)
+            textBox.BackgroundTransparency = 1
+            textBox.PlaceholderText = placeholder or "..."
+            textBox.Text = ""
+            textBox.FontFace = CustomFont
+            textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            textBox.PlaceholderColor3 = Color3.fromRGB(100, 150, 110)
+            textBox.TextSize = 12
+            textBox.ClearTextOnFocus = false
+            textBox.Parent = boxContainer
+
+            textBox.FocusLost:Connect(function(enterPressed)
+                if callback then callback(textBox.Text, enterPressed) end
+            end)
+        end
+
+        return Tab
+    end
+
+    return Window
+end
+
+return Library
+
             label.BackgroundTransparency = 1
             label.Text = text
             label.FontFace = CustomFont
