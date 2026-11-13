@@ -1,452 +1,813 @@
-local Library = {}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EmeraldField UI - Rayfield Inspired Template</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-function Library.Load(options)
-    options = options or {}
-    local title = options.Title or "UI Library"
+  <style>
+    :root {
+      --bg-deep: #05120c;
+      --emerald-dark: #092116;
+      --emerald-mid: #0f3825;
+      --emerald-light: #10b981;
+      --emerald-bright: #34d399;
+      --border-glow: rgba(52, 211, 153, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-deep);
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(16, 185, 129, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(5, 150, 105, 0.18) 0%, transparent 50%),
+        linear-gradient(135deg, #040d09 0%, #092217 48%, #061710 100%);
+      color: #ecfdf5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Viền đen dịu & Đổ bóng chữ đẹp chuẩn Game UI */
+    .text-soft-outline {
+      color: #f0fdf4;
+      text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.95),
+        0 0 1px rgba(0, 0, 0, 0.9),
+        -0.6px -0.6px 0 rgba(3, 12, 8, 0.85),
+         0.6px -0.6px 0 rgba(3, 12, 8, 0.85),
+        -0.6px  0.6px 0 rgba(3, 12, 8, 0.85),
+         0.6px  0.6px 0 rgba(3, 12, 8, 0.85);
+    }
+
+    .text-soft-outline-muted {
+      color: #a7f3d0;
+      text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.9),
+        -0.5px 0.5px 0 rgba(2, 10, 6, 0.8);
+    }
+
+    .text-emerald-glow {
+      background: linear-gradient(135deg, #6ee7b7 0%, #10b981 55%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+    }
+
+    /* Rayfield Main Window Glass & Gradient */
+    .rayfield-window {
+      background: linear-gradient(145deg, rgba(11, 36, 25, 0.92) 0%, rgba(6, 21, 14, 0.96) 55%, rgba(12, 42, 28, 0.93) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      box-shadow: 
+        0 25px 60px -12px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(16, 185, 129, 0.12),
+        inset 0 1px 0 rgba(167, 243, 208, 0.15);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+    }
+
+    /* Rayfield Element Card (Ô chức năng) */
+    .rf-card {
+      background: linear-gradient(135deg, rgba(16, 48, 33, 0.65) 0%, rgba(9, 29, 20, 0.78) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .rf-card:hover {
+      background: linear-gradient(135deg, rgba(20, 60, 41, 0.78) 0%, rgba(11, 36, 25, 0.88) 100%);
+      border-color: rgba(52, 211, 153, 0.38);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), 0 0 15px rgba(16, 185, 129, 0.08);
+    }
+
+    /* Custom Scrollbar */
+    .rf-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .rf-scroll::-webkit-scrollbar-track {
+      background: rgba(5, 18, 12, 0.5);
+      border-radius: 999px;
+    }
+    .rf-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #10b981, #065f46);
+      border-radius: 999px;
+    }
+    .rf-scroll::-webkit-scrollbar-thumb:hover {
+      background: #34d399;
+    }
+
+    /* Custom Range Slider */
+    input[type="range"].rf-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(4, 15, 10, 0.9);
+      border: 1px solid rgba(52, 211, 153, 0.22);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"].rf-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a7f3d0 0%, #10b981 60%, #047857 100%);
+      border: 2px solid #04130c;
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.75);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="range"].rf-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      box-shadow: 0 0 14px rgba(110, 231, 183, 0.95);
+    }
+
+    /* Toggle Switch Pill */
+    .rf-toggle-track {
+      background: rgba(4, 16, 11, 0.9);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .rf-toggle-track.active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: #6ee7b7;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+    }
+    .rf-toggle-thumb {
+      background: #d1fae5;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .rf-toggle-track.active .rf-toggle-thumb {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+
+    /* Sidebar Tab Active */
+    .rf-tab-btn {
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .rf-tab-btn.active {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.24) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border-color: rgba(52, 211, 153, 0.38);
+      box-shadow: inset 3px 0 0 #34d399, 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Notification Animation */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(110%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .toast-enter {
+      animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Subtle Grid Background Overlay */
+    .bg-grid-pattern {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(52, 211, 153, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(52, 211, 153, 0.04) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-grid-pattern flex flex-col items-center justify-center p-3 sm:p-6 relative">
+
+  <!-- Ambient Top Decorative Glow -->
+  <div class="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[70vw] h-[220px] bg-emerald-500/10 blur-[110px] rounded-full"></div>
+
+  <!-- Floating Mini Restore Pill (Hiển thị khi thu nhỏ/ẩn UI) -->
+  <button id="restorePill" onclick="toggleMinimize(false)" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full rayfield-window flex items-center gap-2.5 cursor-pointer hover:scale-105 active:scale-95 transition">
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+    <span class="text-sm font-bold text-soft-outline tracking-wide">Mở lại EmeraldField UI</span>
+    <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-mono">RightShift</span>
+  </button>
+
+  <!-- MAIN RAYFIELD UI WINDOW -->
+  <div id="mainWindow" class="rayfield-window w-full max-w-[920px] rounded-2xl overflow-hidden flex flex-col relative z-10">
     
-    local TweenService = game:GetService("TweenService")
-    local UserInputService = game:GetService("UserInputService")
-    local Players = game:GetService("Players")
+    <!-- TOP BAR (Kéo thả được trên Desktop) -->
+    <div id="dragHeader" class="px-4 sm:px-5 py-3.5 bg-gradient-to-r from-[#0b2e1e]/95 via-[#082015]/95 to-[#0e3824]/95 border-b border-emerald-400/20 flex flex-wrap items-center justify-between gap-3 cursor-move">
+      <!-- Brand / Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-teal-900 p-[1px] shadow-lg shadow-emerald-950/80 flex-shrink-0">
+          <div class="w-full h-full bg-[#061810] rounded-[11px] flex items-center justify-center">
+            <i data-lucide="leaf" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-soft-outline">
+              Emerald<span class="text-emerald-glow">Field</span> UI
+            </h1>
+            <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-soft-outline-muted">
+              v2.4 Rayfield Style
+            </span>
+          </div>
+          <p class="text-[11px] text-emerald-200/75 text-soft-outline-muted hidden sm:block">
+            Giao diện mẫu Gradient Xanh Lá Đậm • Kéo thanh tiêu đề để di chuyển
+          </p>
+        </div>
+      </div>
 
-    local LocalPlayer = Players.LocalPlayer
-    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+      <!-- Search & Window Controls -->
+      <div class="flex items-center gap-2 ml-auto">
+        <!-- Search Box -->
+        <div class="relative hidden md:block">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-emerald-400/80 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="Tìm ô chức năng..." 
+            oninput="filterElements(this.value)"
+            class="w-44 lg:w-56 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#04120b]/85 border border-emerald-500/25 text-emerald-50 placeholder-emerald-400/40 focus:outline-none focus:border-emerald-400/70 transition"
+          />
+        </div>
 
-    -- Xóa UI cũ nếu có
-    if PlayerGui:FindFirstChild("ModularStudsUI") then
-        PlayerGui.ModularStudsUI:Destroy()
-    end
+        <!-- Test Notify Button -->
+        <button onclick="pushNotification('Thông báo mẫu', 'Hệ thống EmeraldField UI hoạt động mượt mà!', 'sparkles')" title="Thử thông báo" class="p-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/25 text-emerald-300 transition active:scale-95">
+          <i data-lucide="bell-ring" class="w-4 h-4"></i>
+        </button>
 
-    -- 1. ScreenGui
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ModularStudsUI"
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.Parent = PlayerGui
+        <!-- Minimize Button -->
+        <button onclick="toggleMinimize(true)" title="Thu nhỏ giao diện" class="p-2 rounded-xl bg-emerald-950/70 hover:bg-emerald-800/50 border border-emerald-500/20 text-emerald-200 transition active:scale-95">
+          <i data-lucide="minus" class="w-4 h-4"></i>
+        </button>
 
-    -- 2. Floating Toggle Button (Nút tròn mở/đóng UI - thay ảnh quả ớt)
-    local ToggleButton = Instance.new("ImageButton")
-    ToggleButton.Name = "ToggleButton"
-    ToggleButton.Size = UDim2.new(0, 44, 0, 44)
-    ToggleButton.Position = UDim2.new(0, 20, 0, 150)
-    ToggleButton.Image = "rbxassetid://11686708746" -- ID ảnh quả ớt mẫu trên Roblox (hoặc thay ID của bạn vào đây)
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 20)
-    ToggleButton.Active = true
-    ToggleButton.Draggable = true
-    ToggleButton.Parent = ScreenGui
+        <!-- Reset Position Button -->
+        <button onclick="resetWindowPosition()" title="Đặt lại vị trí" class="p-2 rounded-xl bg-rose-950/50 hover:bg-rose-800/50 border border-rose-500/25 text-rose-200 transition active:scale-95">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
 
-    local ToggleCorner = Instance.new("UICorner")
-    ToggleCorner.CornerRadius = UDim.new(1, 0)
-    ToggleCorner.Parent = ToggleButton
+    <!-- BODY LAYOUT: SIDEBAR + CONTENT -->
+    <div class="flex flex-col md:flex-row h-[560px] max-h-[76vh]">
+      
+      <!-- LEFT SIDEBAR (Tabs Navigation) -->
+      <aside class="w-full md:w-56 bg-gradient-to-b from-[#071c12]/90 to-[#04110b]/95 border-b md:border-b-0 md:border-r border-emerald-400/15 p-2.5 flex md:flex-col justify-between gap-2 overflow-x-auto md:overflow-y-auto rf-scroll flex-shrink-0">
+        
+        <!-- Navigation Tabs -->
+        <nav class="flex md:flex-col gap-1.5 min-w-max md:min-w-0">
+          <button onclick="switchTab('main', this)" class="rf-tab-btn active flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-semibold text-soft-outline">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+            <span>Tổng Quan (Main)</span>
+          </button>
 
-    local ToggleStroke = Instance.new("UIStroke")
-    ToggleStroke.Color = Color3.fromRGB(91, 186, 63)
-    ToggleStroke.Thickness = 2
-    ToggleStroke.Parent = ToggleButton
+          <button onclick="switchTab('controls', this)" class="rf-tab-btn flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-semibold text-soft-outline-muted hover:text-white">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+            <span>Slider & Bật/Tắt</span>
+          </button>
 
-    -- 3. Main Frame
-    local MainFrame = Instance.new("ImageLabel")
-    MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0, 480, 0, 310)
-    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -155)
-    MainFrame.Image = "rbxassetid://108414675268122"
-    MainFrame.ScaleType = Enum.ScaleType.Tile
-    MainFrame.TileSize = UDim2.new(0, 35, 0, 35)
-    MainFrame.ImageColor3 = Color3.fromRGB(91, 186, 63) -- Đổi ImageColor3 theo yêu cầu
-    MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 15)
-    MainFrame.ClipsDescendants = true
-    MainFrame.Active = true
-    MainFrame.Draggable = true
-    MainFrame.Parent = ScreenGui
+          <button onclick="switchTab('inputs', this)" class="rf-tab-btn flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-semibold text-soft-outline-muted hover:text-white">
+            <i data-lucide="list-filter" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+            <span>Dropdown & Phím</span>
+          </button>
 
-    local MainCorner = Instance.new("UICorner")
-    MainCorner.CornerRadius = UDim.new(0, 8)
-    MainCorner.Parent = MainFrame
+          <button onclick="switchTab('theme', this)" class="rf-tab-btn flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-semibold text-soft-outline-muted hover:text-white">
+            <i data-lucide="palette" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+            <span>Giao Diện & Mẫu</span>
+          </button>
+        </nav>
 
-    local MainStroke = Instance.new("UIStroke")
-    MainStroke.Color = Color3.fromRGB(91, 186, 63)
-    MainStroke.Thickness = 1.5
-    MainStroke.Parent = MainFrame
+        <!-- User Status Footer Card (Desktop) -->
+        <div class="hidden md:flex flex-col gap-2 p-3 rounded-xl bg-gradient-to-br from-emerald-950/80 to-[#04120c] border border-emerald-400/20">
+          <div class="flex items-center gap-2.5">
+            <div class="relative">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-300 flex items-center justify-center text-[#04130c] font-extrabold text-xs shadow">
+                VIP
+              </div>
+              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#05160e]"></span>
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-xs font-bold text-soft-outline truncate">Emerald Member</p>
+              <p class="text-[10px] text-emerald-300/80 font-mono truncate">Ping: 24ms • Active</p>
+            </div>
+          </div>
+        </div>
+      </aside>
 
-    -- Thêm UIGradient cho MainFrame theo thông số bạn cung cấp
-    local MainGradient = Instance.new("UIGradient")
-    MainGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        MainGradient.Color = ColorSequence.new(Color3.fromRGB(91, 186, 63))
-    })
-    -- Các điểm chuyển màu và độ trong suốt (Transparency)
-    MainGradient.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.6),
-        NumberSequenceKeypoint.new(1, 0),
-        NumberSequenceKeypoint.new(0.0156863, 1),
-        NumberSequenceKeypoint.new(0, 0)
-    })
-    -- Sửa lại cú pháp Sequence chuẩn cho các điểm dừng theo yêu cầu: 
-    MainGradient.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.6),
-        NumberSequenceKeypoint.new(1, 0),
-        NumberSequenceKeypoint.new(0.0156863, 1),
-        NumberSequenceKeypoint.new(1, 0)
-    })
-    MainGradient.Parent = MainFrame
+      <!-- RIGHT CONTENT AREA (Scrollable Elements) -->
+      <main id="contentArea" class="flex-1 p-4 sm:p-5 overflow-y-auto rf-scroll space-y-4">
 
-    -- Overlay tối nền
-    local Overlay = Instance.new("Frame")
-    Overlay.Size = UDim2.new(1, 0, 1, 0)
-    Overlay.BackgroundColor3 = Color3.fromRGB(10, 15, 12)
-    Overlay.BackgroundTransparency = 0.4
-    Overlay.Parent = MainFrame
+        <!-- ================= TAB 1: TỔNG QUAN (ALL-IN-ONE SHOWCASE) ================= -->
+        <div data-tab="main" class="tab-panel space-y-3.5">
+          
+          <!-- Section Header -->
+          <div class="flex items-center gap-2.5 pt-1">
+            <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-emerald-300 to-emerald-600 shadow-[0_0_8px_#34d399]"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 text-soft-outline-muted">
+              Bảng Điều Khiển Nhanh • Đầy Đủ Thành Phần
+            </h2>
+          </div>
 
-    -- Font chữ
-    local CustomFont = Font.new(
-        "rbxasset://fonts/families/ComicNeueAngular.json",
-        Enum.FontWeight.Bold,
-        Enum.FontStyle.Normal
-    )
+          <!-- Paragraph / Info Box (Khung thông báo Rayfield) -->
+          <div class="rf-element rf-card p-3.5 rounded-xl border-l-4 border-l-emerald-400 bg-gradient-to-r from-emerald-900/35 to-[#081f15]/70">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-300 mt-0.5">
+                <i data-lucide="info" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-soft-outline">Chào mừng đến với Rayfield Emerald Template</h3>
+                <p class="text-xs text-emerald-100/85 text-soft-outline-muted mt-1 leading-relaxed">
+                  Mẫu giao diện này tích hợp đầy đủ: <b>Nút bật/tắt (Toggle)</b>, <b>Thanh trượt (Slider)</b>, <b>Nút bấm (Button)</b>, <b>Menu chọn (Dropdown)</b>, <b>Phím tắt (Keybind)</b> và <b>Chọn màu (ColorPicker)</b> trên nền gradient xanh lá đậm dịu mắt.
+                </p>
+              </div>
+            </div>
+          </div>
 
-    -- TopBar
-    local TopBar = Instance.new("Frame")
-    TopBar.Size = UDim2.new(1, 0, 0, 35)
-    TopBar.BackgroundTransparency = 1
-    TopBar.Parent = MainFrame
+          <!-- Toggle Switch 1 -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-soft-outline">Tự động tối ưu hiệu năng (Auto Boost)</span>
+                <span id="badge-boost" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">BẬT</span>
+              </div>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted mt-0.5">Kích hoạt chế độ mượt mà và giảm độ trễ khung hình</p>
+            </div>
+            <button type="button" onclick="toggleSwitch(this, 'Tự động tối ưu', 'badge-boost')" class="rf-toggle-track active w-12 h-7 rounded-full p-1 flex items-center cursor-pointer flex-shrink-0">
+              <span class="rf-toggle-thumb w-5 h-5 rounded-full block"></span>
+            </button>
+          </div>
 
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -50, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = title
-    TitleLabel.FontFace = CustomFont
-    TitleLabel.TextColor3 = Color3.fromRGB(91, 186, 63)
-    TitleLabel.TextSize = 15
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Parent = TopBar
+          <!-- Interactive Slider 1 -->
+          <div class="rf-element rf-card p-3.5 rounded-xl space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-bold text-soft-outline">Tốc độ di chuyển (WalkSpeed)</span>
+                <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Kéo thanh trượt hoặc dùng nút +/- để chỉnh chi tiết</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="stepSlider('slider-speed', -5)" class="w-6 h-6 rounded-md bg-emerald-950 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-800/50 text-xs font-bold">-</button>
+                <span id="val-slider-speed" class="min-w-[54px] text-center font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-[#04130c] border border-emerald-400/35 text-emerald-300 text-soft-outline-muted">
+                  65 / 200
+                </span>
+                <button onclick="stepSlider('slider-speed', 5)" class="w-6 h-6 rounded-md bg-emerald-950 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-800/50 text-xs font-bold">+</button>
+              </div>
+            </div>
+            <input id="slider-speed" type="range" min="16" max="200" value="65" oninput="updateSlider(this, 'val-slider-speed', '/ 200')" class="rf-slider" />
+          </div>
 
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 24, 0, 24)
-    CloseBtn.Position = UDim2.new(1, -28, 0.5, -12)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 50, 35)
-    CloseBtn.Text = "X"
-    CloseBtn.FontFace = CustomFont
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-    CloseBtn.TextSize = 12
-    CloseBtn.Parent = TopBar
+          <!-- Action Button -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Thực thi lệnh mẫu (Execute Action)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Nhấn để chạy chức năng và hiển thị thông báo góc màn hình</p>
+            </div>
+            <button onclick="pushNotification('Thực thi thành công', 'Đã kích hoạt lệnh mẫu với cấu hình hiện tại!', 'check-circle-2')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs font-extrabold text-soft-outline border border-emerald-300/40 shadow-lg shadow-emerald-950/60 active:scale-95 transition flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+              <span>Kích Hoạt</span>
+            </button>
+          </div>
 
-    local CloseCorner = Instance.new("UICorner")
-    CloseCorner.CornerRadius = UDim.new(0, 5)
-    CloseCorner.Parent = CloseBtn
+          <!-- Custom Dropdown -->
+          <div class="rf-element rf-card p-3.5 rounded-xl space-y-2 relative">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <span class="text-sm font-bold text-soft-outline">Chế độ hoạt động (Select Mode)</span>
+                <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Chọn phương thức xử lý từ danh sách thả xuống</p>
+              </div>
+              <button id="dropdownBtn" onclick="toggleDropdown('dropdownMenu')" class="min-w-[165px] px-3.5 py-2 rounded-xl bg-[#05160e] hover:bg-[#082216] border border-emerald-400/30 text-xs font-semibold text-soft-outline flex items-center justify-between gap-2 transition">
+                <span id="dropdownLabel">Siêu Mượt (Ultra)</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-emerald-400"></i>
+              </button>
+            </div>
+            <!-- Dropdown List -->
+            <div id="dropdownMenu" class="hidden mt-2 p-1.5 rounded-xl bg-[#05170f] border border-emerald-400/35 shadow-2xl space-y-1">
+              <button onclick="selectDropdownOption('Siêu Mượt (Ultra)')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 flex items-center justify-between">
+                <span>Siêu Mượt (Ultra)</span>
+                <span class="text-[10px] text-emerald-400 font-mono">Khuyên dùng</span>
+              </button>
+              <button onclick="selectDropdownOption('Cân Bằng (Balanced)')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20">
+                Cân Bằng (Balanced)
+              </button>
+              <button onclick="selectDropdownOption('Tiết Kiệm Pin (Eco)')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20">
+                Tiết Kiệm Pin (Eco)
+              </button>
+            </div>
+          </div>
 
-    -- Tab Bar (Danh sách các Tab chuyển trang)
-    local TabBarContainer = Instance.new("ScrollingFrame")
-    TabBarContainer.Size = UDim2.new(0, 110, 1, -45)
-    TabBarContainer.Position = UDim2.new(0, 8, 0, 40)
-    TabBarContainer.BackgroundTransparency = 1
-    TabBarContainer.BorderSizePixel = 0
-    TabBarContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-    TabBarContainer.ScrollBarThickness = 0
-    TabBarContainer.Parent = MainFrame
+        </div>
 
-    local TabBarLayout = Instance.new("UIListLayout")
-    TabBarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    TabBarLayout.Padding = UDim.new(0, 5)
-    TabBarLayout.Parent = TabBarContainer
+        <!-- ================= TAB 2: SLIDER & BẬT/TẮT ================= -->
+        <div data-tab="controls" class="tab-panel hidden space-y-3.5">
+          <div class="flex items-center gap-2.5 pt-1">
+            <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-emerald-300 to-emerald-600"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 text-soft-outline-muted">
+              Bộ Sưu Tập Nút Bật/Tắt & Thanh Trượt
+            </h2>
+          </div>
 
-    -- Đường kẻ dọc chia Tab và Nội dung
-    local Divider = Instance.new("Frame")
-    Divider.Size = UDim2.new(0, 1, 1, -50)
-    Divider.Position = UDim2.new(0, 125, 0, 45)
-    Divider.BackgroundColor3 = Color3.fromRGB(91, 186, 63)
-    Divider.BorderSizePixel = 0
-    Divider.Parent = MainFrame
+          <!-- Toggle 2 -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Hiển thị khung viền phát sáng (Glow ESP)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Làm nổi bật các đối tượng xung quanh bằng ánh xanh lá</p>
+            </div>
+            <button type="button" onclick="toggleSwitch(this, 'Glow ESP')" class="rf-toggle-track active w-12 h-7 rounded-full p-1 flex items-center cursor-pointer flex-shrink-0">
+              <span class="rf-toggle-thumb w-5 h-5 rounded-full block"></span>
+            </button>
+          </div>
 
-    -- Pages Container
-    local PagesContainer = Instance.new("Folder")
-    PagesContainer.Name = "PagesContainer"
-    PagesContainer.Parent = MainFrame
+          <!-- Toggle 3 -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Chống giật & Cố định góc nhìn</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Giữ tâm ngắm ổn định khi di chuyển tốc độ cao</p>
+            </div>
+            <button type="button" onclick="toggleSwitch(this, 'Cố định góc nhìn')" class="rf-toggle-track w-12 h-7 rounded-full p-1 flex items-center cursor-pointer flex-shrink-0">
+              <span class="rf-toggle-thumb w-5 h-5 rounded-full block"></span>
+            </button>
+          </div>
 
-    -- Logic Ẩn/Hiện UI
-    local isOpen = true
-    ToggleButton.MouseButton1Click:Connect(function()
-        isOpen = not isOpen
-        MainFrame.Visible = isOpen
-    end)
-    CloseBtn.MouseButton1Click:Connect(function()
-        isOpen = false
-        MainFrame.Visible = false
-    end)
+          <!-- Slider 2: Jump Power -->
+          <div class="rf-element rf-card p-3.5 rounded-xl space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-soft-outline">Độ cao bật nhảy (JumpPower)</span>
+              <span id="val-jump" class="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-[#04130c] border border-emerald-400/35 text-emerald-300">120</span>
+            </div>
+            <input type="range" min="50" max="300" value="120" oninput="updateSlider(this, 'val-jump', '')" class="rf-slider" />
+          </div>
 
-    -- API Object
-    local Window = {}
+          <!-- Slider 3: FOV -->
+          <div class="rf-element rf-card p-3.5 rounded-xl space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-soft-outline">Góc nhìn rộng (Field of View)</span>
+              <span id="val-fov" class="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-[#04130c] border border-emerald-400/35 text-emerald-300">90°</span>
+            </div>
+            <input type="range" min="60" max="120" value="90" oninput="updateSlider(this, 'val-fov', '°')" class="rf-slider" />
+          </div>
 
-    function Window:CreateTab(tabName)
-        local Tab = {}
+          <!-- Dynamic Status Label -->
+          <div class="rf-element rf-card p-3 rounded-xl flex items-center justify-between bg-emerald-950/50">
+            <span class="text-xs font-semibold text-emerald-200/80 text-soft-outline-muted">Trạng thái hệ thống trực tiếp:</span>
+            <span class="text-xs font-mono font-bold text-emerald-300 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              60 FPS • Ổn định
+            </span>
+          </div>
+        </div>
 
-        local TabButton = Instance.new("TextButton")
-        TabButton.Size = UDim2.new(1, 0, 0, 32)
-        TabButton.BackgroundColor3 = Color3.fromRGB(20, 32, 24)
-        TabButton.BackgroundTransparency = 0.5
-        TabButton.Text = "  " .. tabName
-        TabButton.FontFace = CustomFont
-        TabButton.TextColor3 = Color3.fromRGB(180, 220, 190)
-        TabButton.TextSize = 13
-        TabButton.TextXAlignment = Enum.TextXAlignment.Left
-        TabButton.Parent = TabBarContainer
+        <!-- ================= TAB 3: DROPDOWN, INPUT & KEYBIND ================= -->
+        <div data-tab="inputs" class="tab-panel hidden space-y-3.5">
+          <div class="flex items-center gap-2.5 pt-1">
+            <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-emerald-300 to-emerald-600"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 text-soft-outline-muted">
+              Ô Nhập Liệu, Phím Tắt & Chọn Màu
+            </h2>
+          </div>
 
-        local TabBtnCorner = Instance.new("UICorner")
-        TabBtnCorner.CornerRadius = UDim.new(0, 5)
-        TabBtnCorner.Parent = TabButton
+          <!-- Text Input Box -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Tên hồ sơ cấu hình (Config Name)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Nhập tên cấu hình để lưu trữ nhanh</p>
+            </div>
+            <input 
+              id="configNameInput"
+              type="text" 
+              value="Emerald_Pro_v1" 
+              placeholder="Nhập tên..."
+              onchange="pushNotification('Đã cập nhật tên', 'Tên cấu hình mới: ' + this.value, 'edit-3')"
+              class="w-full sm:w-48 px-3 py-2 rounded-xl bg-[#04130c] border border-emerald-400/30 text-xs font-mono text-emerald-100 focus:outline-none focus:border-emerald-400"
+            />
+          </div>
 
-        local TabPage = Instance.new("ScrollingFrame")
-        TabPage.Size = UDim2.new(1, -135, 1, -45)
-        TabPage.Position = UDim2.new(0, 132, 0, 40)
-        TabPage.BackgroundTransparency = 1
-        TabPage.BorderSizePixel = 0
-        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
-        TabPage.ScrollBarThickness = 3
-        TabPage.ScrollBarImageColor3 = Color3.fromRGB(91, 186, 63)
-        TabPage.Visible = false
-        TabPage.Parent = PagesContainer
+          <!-- Interactive Keybind Listener -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Phím tắt ẩn/hiện Menu (Toggle UI Key)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Nhấn vào ô phím bên phải rồi bấm phím bất kỳ để đổi</p>
+            </div>
+            <button id="keybindBtn" onclick="listenForKeybind()" class="px-4 py-2 rounded-xl bg-[#04130c] hover:bg-emerald-950 border border-emerald-400/40 font-mono text-xs font-bold text-emerald-300 text-soft-outline-muted min-w-[110px] text-center transition">
+              RightShift
+            </button>
+          </div>
 
-        local PageLayout = Instance.new("UIListLayout")
-        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        PageLayout.Padding = UDim.new(0, 6)
-        PageLayout.Parent = TabPage
+          <!-- Color Picker Element -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Màu điểm nhấn chính (Accent Color)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Chọn mã màu xanh lá hoặc tùy chỉnh trực tiếp</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span id="colorHexLabel" class="font-mono text-xs font-bold text-emerald-300">#10B981</span>
+              <label class="w-9 h-9 rounded-xl border-2 border-emerald-300/50 shadow-inner cursor-pointer overflow-hidden flex items-center justify-center" style="background-color: #10b981;" id="colorSwatch">
+                <input type="color" value="#10b981" oninput="updateAccentColor(this.value)" class="opacity-0 w-full h-full cursor-pointer" />
+              </label>
+            </div>
+          </div>
 
-        PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabPage.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 10)
-        end)
+          <!-- Multi-Action Button Row -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Quản lý cấu hình (Config Manager)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Lưu hoặc khôi phục toàn bộ thiết lập</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="pushNotification('Đã lưu Config', 'Lưu thành công hồ sơ ' + document.getElementById('configNameInput').value, 'save')" class="px-3.5 py-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-xs font-bold text-soft-outline border border-emerald-300/30 transition">
+                Lưu Config
+              </button>
+              <button onclick="pushNotification('Đã tải Config', 'Khôi phục dữ liệu mặc định hoàn tất.', 'refresh-cw')" class="px-3.5 py-2 rounded-xl bg-[#05170f] hover:bg-emerald-950 text-xs font-bold text-emerald-200 border border-emerald-500/30 transition">
+                Tải Lại
+              </button>
+            </div>
+          </div>
+        </div>
 
-        TabButton.MouseButton1Click:Connect(function()
-            for _, page in ipairs(PagesContainer:GetChildren()) do
-                page.Visible = false
-            end
-            for _, btn in ipairs(TabBarContainer:GetChildren()) do
-                if btn:IsA("TextButton") then
-                    btn.TextColor3 = Color3.fromRGB(180, 220, 190)
-                    btn.BackgroundTransparency = 0.5
-                end
-            end
-            TabPage.Visible = true
-            TabButton.TextColor3 = Color3.fromRGB(91, 186, 63)
-            TabButton.BackgroundTransparency = 0.2
-        end)
+        <!-- ================= TAB 4: GIAO DIỆN & MẪU CODE ================= -->
+        <div data-tab="theme" class="tab-panel hidden space-y-3.5">
+          <div class="flex items-center gap-2.5 pt-1">
+            <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-emerald-300 to-emerald-600"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 text-soft-outline-muted">
+              Thông Số Thiết Kế & Tiện Ích Mẫu
+            </h2>
+          </div>
 
-        if #PagesContainer:GetChildren() == 1 then
-            TabPage.Visible = true
-            TabButton.TextColor3 = Color3.fromRGB(91, 186, 63)
-            TabButton.BackgroundTransparency = 0.2
-        end
+          <div class="rf-element rf-card p-4 rounded-xl space-y-3">
+            <h3 class="text-sm font-bold text-soft-outline">Đặc điểm nổi bật của Template này</h3>
+            <ul class="space-y-2 text-xs text-emerald-100/85 text-soft-outline-muted">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                <span><b>Gradient Xanh Lá & Xanh Đậm Nhẹ:</b> Kết hợp các lớp nền <code class="text-emerald-300">#092116</code> → <code class="text-emerald-300">#0f3825</code> cùng viền phát sáng dịu mắt.</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                <span><b>Chữ viền đen dịu (Soft Black Outline):</b> Tăng độ tương phản giúp chữ trắng/xanh bạc hà luôn nổi bật trên mọi nền.</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                <span><b>Tương tác đầy đủ:</b> Hỗ trợ kéo thả cửa sổ, tìm kiếm ô chức năng tức thì, phím tắt thu gọn và hệ thống Toast Notification.</span>
+              </li>
+            </ul>
+          </div>
 
-        local function createContainer(sizeY)
-            local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(1, 0, 0, sizeY)
-            frame.BackgroundColor3 = Color3.fromRGB(20, 32, 24)
-            frame.BackgroundTransparency = 0.3
-            
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, 5)
-            corner.Parent = frame
-            
-            local stroke = Instance.new("UIStroke")
-            stroke.Color = Color3.fromRGB(91, 186, 63)
-            stroke.Thickness = 1
-            stroke.Parent = frame
-            
-            return frame
-        end
+          <!-- Preset Gradient Switcher -->
+          <div class="rf-element rf-card p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="text-sm font-bold text-soft-outline">Đổi sắc độ Xanh Lá (Emerald Tone)</span>
+              <p class="text-xs text-emerald-200/70 text-soft-outline-muted">Chuyển đổi nhanh giữa 3 sắc thái xanh lá</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="setThemeTone('emerald')" class="px-3 py-1.5 rounded-lg bg-emerald-600/40 border border-emerald-400/50 text-xs font-bold text-soft-outline hover:bg-emerald-500/50">Ngọc Lục Bảo</button>
+              <button onclick="setThemeTone('forest')" class="px-3 py-1.5 rounded-lg bg-green-900/50 border border-green-400/40 text-xs font-bold text-soft-outline hover:bg-green-700/50">Rừng Đậm</button>
+              <button onclick="setThemeTone('mint')" class="px-3 py-1.5 rounded-lg bg-teal-700/40 border border-teal-300/40 text-xs font-bold text-soft-outline hover:bg-teal-600/50">Bạc Hà Dịu</button>
+            </div>
+          </div>
+        </div>
 
-        function Tab:AddButton(text, callback)
-            local btnFrame = createContainer(32)
-            btnFrame.Parent = TabPage
+      </main>
+    </div>
+  </div>
 
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, 0, 1, 0)
-            btn.BackgroundTransparency = 1
-            btn.Text = text
-            btn.FontFace = CustomFont
-            btn.TextColor3 = Color3.fromRGB(230, 255, 230)
-            btn.TextSize = 13
-            btn.Parent = btnFrame
+  <!-- RAYFIELD FLOATING NOTIFICATION STACK (Bottom-Right) -->
+  <div id="notificationContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2.5 max-w-[330px] w-full pointer-events-none"></div>
 
-            btn.MouseButton1Click:Connect(function()
-                if callback then 
-                    pcall(callback)
-                end
-            end)
-        end
+  <script>
+    // Khởi tạo icons Lucide
+    lucide.createIcons();
 
-        function Tab:AddToggle(text, defaultState, callback)
-            local toggled = defaultState or false
-            local toggleFrame = createContainer(32)
-            toggleFrame.Parent = TabPage
+    let currentToggleKey = 'RightShift';
+    let isListeningKey = false;
 
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(0.7, 0, 1, 0)
-            label.Position = UDim2.new(0, 10, 0, 0)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.FontFace = CustomFont
-            label.TextColor3 = Color3.fromRGB(230, 255, 230)
-            label.TextSize = 13
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = toggleFrame
+    // 1. Chuyển Tab điều hướng
+    function switchTab(tabName, btnElement) {
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      const activePanel = document.querySelector(`.tab-panel[data-tab="${tabName}"]`);
+      if (activePanel) activePanel.classList.remove('hidden');
 
-            local switchBg = Instance.new("Frame")
-            switchBg.Size = UDim2.new(0, 32, 0, 16)
-            switchBg.Position = UDim2.new(1, -42, 0.5, -8)
-            switchBg.BackgroundColor3 = toggled and Color3.fromRGB(91, 186, 63) or Color3.fromRGB(40, 60, 45)
-            switchBg.Parent = toggleFrame
+      document.querySelectorAll('.rf-tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'text-soft-outline');
+        btn.classList.add('text-soft-outline-muted');
+      });
+      btnElement.classList.add('active', 'text-soft-outline');
+      btnElement.classList.remove('text-soft-outline-muted');
+    }
 
-            local switchCorner = Instance.new("UICorner")
-            switchCorner.CornerRadius = UDim.new(1, 0)
-            switchCorner.Parent = switchBg
+    // 2. Xử lý nút Bật/Tắt (Toggle Switch)
+    function toggleSwitch(el, featureName, badgeId) {
+      el.classList.toggle('active');
+      const isActive = el.classList.contains('active');
+      
+      if (badgeId) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+          badge.textContent = isActive ? 'BẬT' : 'TẮT';
+          badge.className = isActive 
+            ? 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+            : 'text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-400/30';
+        }
+      }
 
-            local circle = Instance.new("Frame")
-            circle.Size = UDim2.new(0, 12, 0, 12)
-            circle.Position = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
-            circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            circle.Parent = switchBg
+      pushNotification(
+        featureName,
+        isActive ? 'Đã kích hoạt tính năng thành công.' : 'Đã tạm tắt tính năng.',
+        isActive ? 'toggle-right' : 'toggle-left'
+      );
+    }
 
-            local circleCorner = Instance.new("UICorner")
-            circleCorner.CornerRadius = UDim.new(1, 0)
-            circleCorner.Parent = circle
+    // 3. Xử lý thanh trượt (Slider)
+    function updateSlider(inputEl, labelId, suffix) {
+      const label = document.getElementById(labelId);
+      if (label) {
+        label.textContent = `${inputEl.value}${suffix ? ' ' + suffix : ''}`;
+      }
+    }
 
-            local clickBtn = Instance.new("TextButton")
-            clickBtn.Size = UDim2.new(1, 0, 1, 0)
-            clickBtn.BackgroundTransparency = 1
-            clickBtn.Text = ""
-            clickBtn.Parent = toggleFrame
+    function stepSlider(sliderId, delta) {
+      const slider = document.getElementById(sliderId);
+      if (!slider) return;
+      const newVal = Math.min(Number(slider.max), Math.max(Number(slider.min), Number(slider.value) + delta));
+      slider.value = newVal;
+      slider.dispatchEvent(new Event('input'));
+    }
 
-            clickBtn.MouseButton1Click:Connect(function()
-                toggled = not toggled
-                local targetPos = toggled and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
-                local targetColor = toggled and Color3.fromRGB(91, 186, 63) or Color3.fromRGB(40, 60, 45)
+    // 4. Xử lý Dropdown Menu
+    function toggleDropdown(menuId) {
+      const menu = document.getElementById(menuId);
+      if (menu) menu.classList.toggle('hidden');
+    }
 
-                TweenService:Create(circle, TweenInfo.new(0.15), {Position = targetPos}):Play()
-                TweenService:Create(switchBg, TweenInfo.new(0.15), {BackgroundColor3 = targetColor}):Play()
+    function selectDropdownOption(value) {
+      document.getElementById('dropdownLabel').textContent = value;
+      document.getElementById('dropdownMenu').classList.add('hidden');
+      pushNotification('Chế độ đã chọn', `Đã chuyển sang: ${value}`, 'layers');
+    }
 
-                if callback then callback(toggled) end
-            end)
-        end
+    // 5. Lắng nghe phím tắt (Keybind)
+    function listenForKeybind() {
+      const btn = document.getElementById('keybindBtn');
+      isListeningKey = true;
+      btn.textContent = '... Nhấn phím ...';
+      btn.classList.add('border-emerald-300', 'text-white');
+    }
 
-        function Tab:AddSlider(text, min, max, default, callback)
-            local value = default or min
-            local sliderFrame = createContainer(40)
-            sliderFrame.Parent = TabPage
+    document.addEventListener('keydown', (e) => {
+      if (isListeningKey) {
+        e.preventDefault();
+        currentToggleKey = e.code;
+        const btn = document.getElementById('keybindBtn');
+        btn.textContent = currentToggleKey;
+        btn.classList.remove('border-emerald-300', 'text-white');
+        isListeningKey = false;
+        pushNotification('Đã gán phím tắt', `Phím ẩn/hiện UI mới: ${currentToggleKey}`, 'keyboard');
+        return;
+      }
 
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(0.6, 0, 0, 18)
-            label.Position = UDim2.new(0, 10, 0, 3)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.FontFace = CustomFont
-            label.TextColor3 = Color3.fromRGB(230, 255, 230)
-            label.TextSize = 12
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = sliderFrame
+      // Ẩn / Hiện giao diện bằng phím tắt
+      if (e.code === currentToggleKey) {
+        const win = document.getElementById('mainWindow');
+        const isHidden = win.classList.contains('hidden');
+        toggleMinimize(!isHidden);
+      }
+    });
 
-            local valLabel = Instance.new("TextLabel")
-            valLabel.Size = UDim2.new(0.3, 0, 0, 18)
-            valLabel.Position = UDim2.new(0.7, -10, 0, 3)
-            valLabel.BackgroundTransparency = 1
-            valLabel.Text = tostring(value)
-            valLabel.FontFace = CustomFont
-            valLabel.TextColor3 = Color3.fromRGB(150, 220, 170)
-            valLabel.TextSize = 12
-            valLabel.TextXAlignment = Enum.TextXAlignment.Right
-            valLabel.Parent = sliderFrame
+    // 6. Đổi màu điểm nhấn (Color Picker)
+    function updateAccentColor(hex) {
+      document.getElementById('colorHexLabel').textContent = hex.toUpperCase();
+      document.getElementById('colorSwatch').style.backgroundColor = hex;
+      document.getElementById('mainWindow').style.borderColor = hex + '66';
+    }
 
-            local track = Instance.new("Frame")
-            track.Size = UDim2.new(1, -20, 0, 5)
-            track.Position = UDim2.new(0, 10, 0, 25)
-            track.BackgroundColor3 = Color3.fromRGB(30, 45, 35)
-            track.Parent = sliderFrame
+    // 7. Đổi sắc độ Gradient Xanh lá
+    function setThemeTone(tone) {
+      const win = document.getElementById('mainWindow');
+      if (tone === 'emerald') {
+        win.style.background = 'linear-gradient(145deg, rgba(11, 36, 25, 0.92) 0%, rgba(6, 21, 14, 0.96) 55%, rgba(12, 42, 28, 0.93) 100%)';
+        pushNotification('Sắc độ Ngọc Lục Bảo', 'Đã áp dụng gradient xanh lá ngọc tiêu chuẩn.', 'palette');
+      } else if (tone === 'forest') {
+        win.style.background = 'linear-gradient(145deg, rgba(8, 28, 16, 0.95) 0%, rgba(4, 15, 9, 0.98) 55%, rgba(10, 34, 20, 0.95) 100%)';
+        pushNotification('Sắc độ Rừng Đậm', 'Đã áp dụng nền xanh lá rừng sâu dịu mắt.', 'trees');
+      } else if (tone === 'mint') {
+        win.style.background = 'linear-gradient(145deg, rgba(13, 46, 36, 0.92) 0%, rgba(7, 26, 21, 0.96) 55%, rgba(15, 54, 43, 0.93) 100%)';
+        pushNotification('Sắc độ Bạc Hà Dịu', 'Đã áp dụng gradient xanh bạc hà tươi sáng.', 'sparkles');
+      }
+    }
 
-            local trackCorner = Instance.new("UICorner")
-            trackCorner.CornerRadius = UDim.new(1, 0)
-            trackCorner.Parent = track
+    // 8. Tìm kiếm nhanh các ô chức năng
+    function filterElements(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        document.querySelectorAll('.rf-element').forEach(el => el.classList.remove('hidden'));
+        return;
+      }
+      // Hiển thị tất cả tab khi đang tìm kiếm để lọc toàn bộ
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('hidden'));
+      document.querySelectorAll('.rf-element').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        el.classList.toggle('hidden', !text.includes(q));
+      });
+    }
 
-            local fill = Instance.new("Frame")
-            fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
-            fill.BackgroundColor3 = Color3.fromRGB(91, 186, 63)
-            fill.Parent = track
+    // 9. Thu nhỏ / Phóng to giao diện
+    function toggleMinimize(minimize) {
+      const win = document.getElementById('mainWindow');
+      const pill = document.getElementById('restorePill');
+      if (minimize) {
+        win.classList.add('hidden');
+        pill.classList.remove('hidden');
+      } else {
+        win.classList.remove('hidden');
+        pill.classList.add('hidden');
+      }
+    }
 
-            local fillCorner = Instance.new("UICorner")
-            fillCorner.CornerRadius = UDim.new(1, 0)
-            fillCorner.Parent = fill
+    // 10. Hệ thống Thông báo Rayfield (Toast Notification)
+    function pushNotification(title, message, iconName = 'bell') {
+      const container = document.getElementById('notificationContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast-enter pointer-events-auto rounded-xl p-3.5 bg-gradient-to-r from-[#0c3121]/95 to-[#061a11]/95 backdrop-blur-md border border-emerald-400/35 shadow-2xl flex items-start gap-3 relative overflow-hidden';
+      
+      toast.innerHTML = `
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 flex-shrink-0 mt-0.5">
+          <i data-lucide="${iconName}" class="w-4 h-4"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h4 class="text-xs font-extrabold text-soft-outline truncate">${title}</h4>
+          <p class="text-[11px] text-emerald-100/85 text-soft-outline-muted mt-0.5 leading-snug">${message}</p>
+        </div>
+        <div class="absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-emerald-400 to-teal-300 w-full transition-all duration-[3200ms] ease-linear" id="bar-${Date.now()}"></div>
+      `;
 
-            local dragging = false
-            local function update(input)
-                local pos = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
-                local currentVal = math.floor(min + ((max - min) * pos))
-                valLabel.Text = tostring(currentVal)
-                fill.Size = UDim2.new(pos, 0, 1, 0)
-                if callback then callback(currentVal) end
-            end
+      container.appendChild(toast);
+      lucide.createIcons();
 
-            sliderFrame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = true
-                    update(input)
-                end
-            end)
-            UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = false
-                end
-            end)
-            UserInputService.InputChanged:Connect(function(input)
-                if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                    update(input)
-                end
-            end)
-        end
+      const progressBar = toast.querySelector('div[id^="bar-"]');
+      requestAnimationFrame(() => {
+        if (progressBar) progressBar.style.width = '0%';
+      });
 
-        function Tab:AddTextbox(text, placeholder, callback)
-            local boxFrame = createContainer(32)
-            boxFrame.Parent = TabPage
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(30px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+      }, 3200);
+    }
 
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(0.5, 0, 1, 0)
-            label.Position = UDim2.new(0, 10, 0, 0)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.FontFace = CustomFont
-            label.TextColor3 = Color3.fromRGB(230, 255, 230)
-            label.TextSize = 13
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = boxFrame
+    // 11. Tính năng Kéo thả Cửa sổ (Draggable Window)
+    const mainWindow = document.getElementById('mainWindow');
+    const dragHeader = document.getElementById('dragHeader');
+    let isDragging = false, startX, startY, currentX = 0, currentY = 0;
 
-            local boxContainer = Instance.new("Frame")
-            boxContainer.Size = UDim2.new(0.45, 0, 0, 22)
-            boxContainer.Position = UDim2.new(0.55, -10, 0.5, -11)
-            boxContainer.BackgroundColor3 = Color3.fromRGB(15, 25, 18)
-            boxContainer.Parent = boxFrame
+    dragHeader.addEventListener('mousedown', (e) => {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      isDragging = true;
+      startX = e.clientX - currentX;
+      startY = e.clientY - currentY;
+    });
 
-            local boxCorner = Instance.new("UICorner")
-            boxCorner.CornerRadius = UDim.new(0, 4)
-            boxCorner.Parent = boxContainer
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      mainWindow.style.transform = `translate(${currentX}px, ${currentY}px)`;
+    });
 
-            local textBox = Instance.new("TextBox")
-            textBox.Size = UDim2.new(1, -8, 1, 0)
-            textBox.Position = UDim2.new(0, 4, 0, 0)
-            textBox.BackgroundTransparency = 1
-            textBox.PlaceholderText = placeholder or "..."
-            textBox.Text = ""
-            textBox.FontFace = CustomFont
-            textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-            textBox.PlaceholderColor3 = Color3.fromRGB(100, 150, 110)
-            textBox.TextSize = 12
-            textBox.ClearTextOnFocus = false
-            textBox.Parent = boxContainer
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
 
-            textBox.FocusLost:Connect(function(enterPressed)
-                if callback then callback(textBox.Text, enterPressed) end
-            end)
-        end
+    function resetWindowPosition() {
+      currentX = 0;
+      currentY = 0;
+      mainWindow.style.transform = 'translate(0px, 0px)';
+      pushNotification('Đặt lại vị trí', 'Cửa sổ giao diện đã trở về trung tâm.', 'compass');
+    }
 
-        return Tab
-    end
-
-    return Window
-end
-
-return Library
+    // Thông báo chào mừng khi tải trang
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        pushNotification('EmeraldField UI Sẵn Sàng', 'Nhấn RightShift để ẩn/hiện nhanh giao diện.', 'sparkles');
+      }, 450);
+    });
+  </script>
+</body>
+</html>
