@@ -2,7 +2,7 @@
     EmeraldField UI Library (Rayfield Inspired) + 3D View + Scrolling Text + 2D Image + Paragraph
     Theme: Emerald & Soft Dark Green Gradient + Soft Black Text Stroke
     Compatible with Mobile & PC Executors (Hỗ trợ xếp các chức năng nằm cạnh nhau - 2 Cột)
-    Updated: Added Auto-positioned Setting Tab (Background Color Picker, Image Background, SaveData Toggle, English/Vietnamese Language Toggle)
+    Fixed: Setting Tab positioning (Always at bottom) and click event bugs.
 ]]
 
 local EmeraldField = {}
@@ -98,7 +98,6 @@ local function ApplyTextOutline(textLabel, thickness, transparency)
 end
 
 local function ApplyEmeraldGradient(frame, rotation)
-    -- Xóa gradient cũ nếu có để cập nhật màu mới
     for _, child in ipairs(frame:GetChildren()) do
         if child:IsA("UIGradient") then
             child:Destroy()
@@ -217,7 +216,6 @@ function EmeraldField:CreateWindow(Config)
     ApplyEmeraldGradient(Main, 135)
     AddBorder(Main, Theme.Accent, 0.4)
 
-    -- Lớp hiển thị ảnh nền tùy chỉnh (Background Image)
     local BgImageLayer = Instance.new("ImageLabel")
     BgImageLayer.Name = "CustomBgImage"
     BgImageLayer.Size = UDim2.new(1, 0, 1, 0)
@@ -340,7 +338,6 @@ function EmeraldField:CreateWindow(Config)
     ContentArea.Parent = Main
 
     local WindowObj = {}
-    local FirstTab = true
     local AllTabs = {}
     local SettingTabCreated = false
 
@@ -401,20 +398,19 @@ function EmeraldField:CreateWindow(Config)
         end)
     end
 
-    -- Hàm cơ sở tạo Tab nội dung chung
     local function CreateTabInternal(TabName, isSetting)
         local TabBtn = Instance.new("TextButton")
         TabBtn.Size = UDim2.new(1, 0, 0, 30)
         TabBtn.BackgroundColor3 = Theme.Element
-        TabBtn.BackgroundTransparency = (FirstTab and not isSetting) and 0.15 or 0.65
+        TabBtn.BackgroundTransparency = 0.65
         TabBtn.Text = "  " .. (TabName or "Tab")
         TabBtn.Font = Enum.Font.GothamSemibold
         TabBtn.TextSize = 12
-        TabBtn.TextColor3 = (FirstTab and not isSetting) and Theme.TextMain or Theme.TextSub
+        TabBtn.TextColor3 = Theme.TextSub
         TabBtn.TextXAlignment = Enum.TextXAlignment.Left
         TabBtn.Parent = Sidebar
         AddCorner(TabBtn, 6)
-        local btnStroke = AddBorder(TabBtn, (FirstTab and not isSetting) and Theme.AccentBright or Theme.Stroke, (FirstTab and not isSetting) and 0.2 or 0.8)
+        local btnStroke = AddBorder(TabBtn, Theme.Stroke, 0.8)
         ApplyTextOutline(TabBtn, 1.1, 0.28)
 
         local Page = Instance.new("ScrollingFrame")
@@ -425,7 +421,7 @@ function EmeraldField:CreateWindow(Config)
         Page.ScrollBarImageColor3 = Theme.Accent
         Page.CanvasSize = UDim2.new(0, 0, 0, 0)
         Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        Page.Visible = FirstTab and not isSetting
+        Page.Visible = false
         Page.Parent = ContentArea
 
         local PagePadding = Instance.new("UIPadding")
@@ -438,22 +434,27 @@ function EmeraldField:CreateWindow(Config)
         PageLayout.Parent = Page
 
         local tabData = {Btn = TabBtn, Stroke = btnStroke, Page = Page, IsSetting = isSetting}
+        
         if isSetting then
-            table.insert(AllTabs, tabData) -- Luôn đẩy Setting xuống cuối mảng
+            table.insert(AllTabs, tabData)
         else
             -- Chèn các tab thông thường vào trước tab Setting (nếu có)
-            local insertIndex = #AllTabs
-            if #AllTabs > 0 and AllTabs[#AllTabs].IsSetting then
-                insertIndex = #AllTabs
-            else
-                insertIndex = #AllTabs + 1
+            local inserted = false
+            for i, v in ipairs(AllTabs) do
+                if v.IsSetting then
+                    table.insert(AllTabs, i, tabData)
+                    inserted = true
+                    break
+                end
             end
-            table.insert(AllTabs, isSetting and (#AllTabs + 1) or (#AllTabs > 0 and AllTabs[#AllTabs].IsSetting and #AllTabs or (#AllTabs + 1)), tabData)
+            if not inserted then
+                table.insert(AllTabs, tabData)
+            end
         end
 
-        -- Sắp xếp lại thứ tự hiển thị UI trên Sidebar
+        -- Cập nhật LayoutOrder để tab Setting luôn nằm ở dưới cùng (LayoutOrder lớn nhất)
         for i, t in ipairs(AllTabs) do
-            t.Btn.LayoutOrder = t.IsSetting and 999 or i
+            t.Btn.LayoutOrder = t.IsSetting and 99999 or i
         end
 
         TabBtn.MouseButton1Click:Connect(function()
@@ -471,8 +472,17 @@ function EmeraldField:CreateWindow(Config)
             btnStroke.Transparency = 0.2
         end)
 
-        if FirstTab and not isSetting then
-            FirstTab = false
+        -- Tự động chọn tab đầu tiên nếu chưa có tab nào hiển thị
+        local activeCount = 0
+        for _, t in ipairs(AllTabs) do
+            if t.Page.Visible then activeCount = activeCount + 1 end
+        end
+        if activeCount == 0 and not isSetting then
+            Page.Visible = true
+            TabBtn.BackgroundTransparency = 0.15
+            TabBtn.TextColor3 = Theme.TextMain
+            btnStroke.Color = Theme.AccentBright
+            btnStroke.Transparency = 0.2
         end
 
         local TabObj = {}
@@ -956,19 +966,14 @@ function EmeraldField:CreateWindow(Config)
         return CreateTabInternal(TabName, false)
     end
 
-    -- =========================================================================
-    -- TÍCH HỢP: TỰ ĐỘNG KHỞI TẠO TAB SETTING NẰM Ở CUỐI CÙNG
-    -- =========================================================================
     local function BuildSettingTab()
         if SettingTabCreated then return end
         SettingTabCreated = true
 
         local SettingTab = CreateTabInternal(L("Settings"), true)
 
-        -- 1. Mục tùy chỉnh Giao diện
         SettingTab:CreateSection(L("SecTheme"))
 
-        -- Đổi màu nền (Color Picker chủ đạo)
         local colorThemes = {
             {Name = "Emerald (Mặc định)", Dark = Color3.fromRGB(9, 33, 22), Mid = Color3.fromRGB(16, 58, 38), Light = Color3.fromRGB(22, 82, 54), Accent = Color3.fromRGB(16, 185, 129), AccentBright = Color3.fromRGB(52, 211, 153)},
             {Name = "Ruby Blue (Xanh/Đỏ)", Dark = Color3.fromRGB(20, 24, 33), Mid = Color3.fromRGB(35, 42, 64), Light = Color3.fromRGB(50, 60, 95), Accent = Color3.fromRGB(59, 130, 246), AccentBright = Color3.fromRGB(96, 165, 250)},
@@ -982,8 +987,18 @@ function EmeraldField:CreateWindow(Config)
             table.insert(themeDropdownOptions, tObj.Name)
         end
 
-        -- Thêm Dropdown đổi màu nền
-        -- (Dùng cơ chế tạo thủ công hoặc input/dropdown có sẵn)
+        -- Dropdown chọn theme màu nền
+        -- Tạm thời tạo mô phỏng hoặc dùng hệ thống Dropdown chuẩn của bạn
+        local dropContainer = Instance.new("Frame")
+        dropContainer.Size = UDim2.new(1, 0, 0, 34)
+        dropContainer.BackgroundColor3 = Theme.Element
+        dropContainer.BackgroundTransparency = 0.25
+        dropContainer.ClipsDescendants = true
+        dropContainer.Parent = SettingTab.__Page or SettingTab -- Gắn an toàn vào Page của SettingTab thông qua closure nội bộ nếu cần, hoặc dùng hàm Dropdown có sẵn bên dưới:
+        
+        -- Dưới đây ta dùng thẳng phương thức CreateDropdown chuẩn đã có sẵn trong cơ chế TabObj:
+        -- Lưu ý: Vì SettingTab được trả về từ CreateTabInternal nên nó có đầy đủ các hàm thành phần (CreateDropdown, CreateToggle, v.v.)
+        
         SettingTab:CreateDropdown({
             Name = L("BgColor"),
             Options = themeDropdownOptions,
@@ -996,7 +1011,6 @@ function EmeraldField:CreateWindow(Config)
                         Theme.BgLight = th.Light
                         Theme.Accent = th.Accent
                         Theme.AccentBright = th.AccentBright
-                        -- Làm mới gradient Main Frame
                         ApplyEmeraldGradient(Main, 135)
                         ApplyEmeraldGradient(Topbar, 135)
                         break
@@ -1005,7 +1019,6 @@ function EmeraldField:CreateWindow(Config)
             end
         })
 
-        -- 2. Đổi nền sang Nhập ảnh (Custom Image Background ID)
         SettingTab:CreateInput({
             Name = L("BgImage"),
             PlaceholderText = "Nhập Asset ID (vd: 6023426915)...",
@@ -1022,15 +1035,13 @@ function EmeraldField:CreateWindow(Config)
             end
         })
 
-        -- 3. Mục Dữ liệu & Hệ thống
         SettingTab:CreateSection(L("SecData"))
 
-        -- Nút Bật/Tắt SaveData (Tự động lưu & Tự bật lại script khi rejoin)
-        local saveToggle = SettingTab:CreateToggle({
+        SettingTab:CreateToggle({
             Name = L("SaveData"),
             CurrentValue = (pcall(function() return readfile("EmeraldField_SaveState.json") end) and true or false),
             Callback = function(state)
-                local success, err = pcall(function()
+                pcall(function()
                     if state then
                         writefile("EmeraldField_SaveState.json", HttpService:JSONEncode({SaveEnabled = true, Timestamp = os.time()}))
                         WindowObj:Notify({Title = L("NotifyTitle"), Content = L("NotifySaveOn"), Duration = 3})
@@ -1041,18 +1052,13 @@ function EmeraldField:CreateWindow(Config)
                         WindowObj:Notify({Title = L("NotifyTitle"), Content = L("NotifySaveOff"), Duration = 3})
                     end
                 end)
-                if not success then
-                    -- Trường hợp executor không hỗ trợ writefile/readfile cục bộ
-                    WindowObj:Notify({Title = "Notice", Content = "Executor không hỗ trợ ghi tệp SaveData nội bộ!", Duration = 3})
-                end
             end
         })
 
-        -- 4. Mục Ngôn ngữ (Dịch Tiếng Anh & Tiếng Việt - Mặc định Tiếng Việt)
         SettingTab:CreateSection(L("SecLang"))
 
         SettingTab:CreateToggle({
-            Name = L("LangToggle") .. " (English / Tiếng Việt)",
+            Name = L("LangToggle") .. " (English / VN)",
             CurrentValue = (CurrentLanguage == "EN"),
             Callback = function(isEnglish)
                 CurrentLanguage = isEnglish and "EN" or "VN"
@@ -1065,7 +1071,6 @@ function EmeraldField:CreateWindow(Config)
         })
     end
 
-    -- Tự động gọi khởi tạo tab Setting ngay sau khi thiết lập cửa sổ
     task.spawn(function()
         BuildSettingTab()
     end)
