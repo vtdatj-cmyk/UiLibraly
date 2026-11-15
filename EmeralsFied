@@ -136,7 +136,7 @@ function EmeraldField:CreateWindow(Config)
     OpenBtn.Size = UDim2.new(0, 120, 0, 34)
     OpenBtn.Position = UDim2.new(0, 16, 0, 16)
     OpenBtn.BackgroundColor3 = Color3.new(1, 1, 1)
-    OpenBtn.Text = "🌿 Mở Menu"
+    OpenBtn.Text = "Open Menu"
     OpenBtn.Font = Enum.Font.GothamBold
     OpenBtn.TextSize = 13
     OpenBtn.TextColor3 = Theme.TextMain
@@ -216,7 +216,7 @@ function EmeraldField:CreateWindow(Config)
     CloseBtn.Size = UDim2.new(0, 26, 0, 26)
     CloseBtn.Position = UDim2.new(1, -32, 0.5, -13)
     CloseBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 35)
-    CloseBtn.Text = "✕"
+    CloseBtn.Text = "X"
     CloseBtn.Font = Enum.Font.GothamBold
     CloseBtn.TextSize = 12
     CloseBtn.TextColor3 = Theme.TextMain
