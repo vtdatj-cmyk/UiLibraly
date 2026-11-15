@@ -1,3 +1,9 @@
+--[[
+    EmeraldField UI Library (Rayfield Inspired) + 3D View + Scrolling Text + 2D Image + Paragraph
+    Theme: Emerald & Soft Dark Green Gradient + Soft Black Text Stroke
+    Compatible with Mobile & PC Executors
+]]
+
 local EmeraldField = {}
 
 local TweenService = game:GetService("TweenService")
@@ -5,6 +11,7 @@ local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
+-- Hàm bảo vệ GUI tránh bị phát hiện cơ bản
 local function getGuiParent()
     local success, result = pcall(function()
         return gethui and gethui() or CoreGui
@@ -15,13 +22,14 @@ local function getGuiParent()
     return Players.LocalPlayer:WaitForChild("PlayerGui")
 end
 
+-- Bảng màu chuẩn Emerald Theme
 local Theme = {
-    BgDark = Color3.fromRGB(9, 33, 22),
-    BgMid = Color3.fromRGB(16, 58, 38),
-    BgLight = Color3.fromRGB(22, 82, 54),
-    Element = Color3.fromRGB(14, 46, 31),
+    BgDark = Color3.fromRGB(9, 33, 22),       -- #092116 Xanh lá đậm nhẹ
+    BgMid = Color3.fromRGB(16, 58, 38),       -- #103a26 Xanh lá trung bình
+    BgLight = Color3.fromRGB(22, 82, 54),     -- #165236 Xanh ngọc lục bảo
+    Element = Color3.fromRGB(14, 46, 31),     -- Nền ô chức năng
     ElementHover = Color3.fromRGB(20, 66, 44),
-    Accent = Color3.fromRGB(16, 185, 129),
+    Accent = Color3.fromRGB(16, 185, 129),    -- #10b981 Emerald sáng
     AccentBright = Color3.fromRGB(52, 211, 153),
     Stroke = Color3.fromRGB(45, 130, 90),
     TextMain = Color3.fromRGB(240, 253, 244),
@@ -29,6 +37,7 @@ local Theme = {
     BlackStroke = Color3.fromRGB(4, 12, 8)
 }
 
+-- Hàm tạo viền đen dịu cho chữ
 local function ApplyTextOutline(textLabel, thickness, transparency)
     local stroke = Instance.new("UIStroke")
     stroke.Color = Theme.BlackStroke
@@ -39,6 +48,7 @@ local function ApplyTextOutline(textLabel, thickness, transparency)
     return stroke
 end
 
+-- Hàm tạo nền Gradient Xanh lá
 local function ApplyEmeraldGradient(frame, rotation)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
@@ -51,6 +61,7 @@ local function ApplyEmeraldGradient(frame, rotation)
     return gradient
 end
 
+-- Hàm bo góc
 local function AddCorner(instance, radius)
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, radius or 8)
@@ -58,6 +69,7 @@ local function AddCorner(instance, radius)
     return corner
 end
 
+-- Hàm viền khung
 local function AddBorder(instance, color, transparency)
     local stroke = Instance.new("UIStroke")
     stroke.Color = color or Theme.Stroke
@@ -68,6 +80,7 @@ local function AddBorder(instance, color, transparency)
     return stroke
 end
 
+-- Hàm hỗ trợ kéo thả (PC & Mobile)
 local function MakeDraggable(topBar, mainFrame)
     local dragging, dragInput, dragStart, startPos
     topBar.InputBegan:Connect(function(input)
@@ -100,7 +113,7 @@ end
 function EmeraldField:CreateWindow(Config)
     Config = Config or {}
     local TitleText = Config.Name or "EmeraldField UI"
-    local SubTitleText = Config.Subtitle or "v3.0 • Advanced Edition"
+    local SubTitleText = Config.Subtitle or "v2.9 • Ultimate Edition"
 
     local parentGui = getGuiParent()
     if parentGui:FindFirstChild("EmeraldFieldUI") then
@@ -113,6 +126,7 @@ function EmeraldField:CreateWindow(Config)
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = parentGui
 
+    -- Khung thông báo (Notifications)
     local NotifyHolder = Instance.new("Frame")
     NotifyHolder.Name = "Notifications"
     NotifyHolder.Size = UDim2.new(0, 270, 1, -20)
@@ -125,12 +139,13 @@ function EmeraldField:CreateWindow(Config)
     NotifyLayout.Padding = UDim.new(0, 8)
     NotifyLayout.Parent = NotifyHolder
 
+    -- Nút mở lại UI khi thu nhỏ
     local OpenBtn = Instance.new("TextButton")
     OpenBtn.Name = "OpenToggle"
     OpenBtn.Size = UDim2.new(0, 125, 0, 36)
     OpenBtn.Position = UDim2.new(0, 16, 0, 16)
     OpenBtn.BackgroundColor3 = Color3.new(1, 1, 1)
-    OpenBtn.Text = "Open Menu"
+    OpenBtn.Text = "🌿 Mở Menu"
     OpenBtn.Font = Enum.Font.GothamBold
     OpenBtn.TextSize = 13
     OpenBtn.TextColor3 = Theme.TextMain
@@ -142,10 +157,11 @@ function EmeraldField:CreateWindow(Config)
     ApplyTextOutline(OpenBtn, 1.2, 0.25)
     MakeDraggable(OpenBtn, OpenBtn)
 
+    -- Khung chính (Main Window)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
-    Main.Size = UDim2.new(0, 560, 0, 380)
-    Main.Position = UDim2.new(0.5, -280, 0.5, -190)
+    Main.Size = UDim2.new(0, 580, 0, 400)
+    Main.Position = UDim2.new(0.5, -290, 0.5, -200)
     Main.BackgroundColor3 = Color3.new(1, 1, 1)
     Main.ClipsDescendants = true
     Main.Parent = ScreenGui
@@ -153,6 +169,7 @@ function EmeraldField:CreateWindow(Config)
     ApplyEmeraldGradient(Main, 135)
     AddBorder(Main, Theme.Accent, 0.4)
 
+    -- Thanh tiêu đề (Topbar)
     local Topbar = Instance.new("Frame")
     Topbar.Name = "Topbar"
     Topbar.Size = UDim2.new(1, 0, 0, 46)
@@ -193,6 +210,7 @@ function EmeraldField:CreateWindow(Config)
     SubLabel.Parent = Topbar
     ApplyTextOutline(SubLabel, 1, 0.35)
 
+    -- Nút thu nhỏ & Đóng
     local MinBtn = Instance.new("TextButton")
     MinBtn.Size = UDim2.new(0, 28, 0, 28)
     MinBtn.Position = UDim2.new(1, -68, 0.5, -14)
@@ -232,6 +250,7 @@ function EmeraldField:CreateWindow(Config)
         ScreenGui:Destroy()
     end)
 
+    -- Cột Tab bên trái (Sidebar)
     local Sidebar = Instance.new("ScrollingFrame")
     Sidebar.Name = "Sidebar"
     Sidebar.Size = UDim2.new(0, 145, 1, -56)
@@ -257,6 +276,7 @@ function EmeraldField:CreateWindow(Config)
     SideLayout.Padding = UDim.new(0, 5)
     SideLayout.Parent = Sidebar
 
+    -- Vùng chứa nội dung các Tab
     local ContentArea = Instance.new("Frame")
     ContentArea.Name = "ContentArea"
     ContentArea.Size = UDim2.new(1, -168, 1, -56)
@@ -268,6 +288,7 @@ function EmeraldField:CreateWindow(Config)
     local FirstTab = true
     local AllTabs = {}
 
+    -- Hàm gửi thông báo nổi
     function WindowObj:Notify(NotifyConfig)
         NotifyConfig = NotifyConfig or {}
         local nTitle = NotifyConfig.Title or "Thông báo"
@@ -325,6 +346,7 @@ function EmeraldField:CreateWindow(Config)
         end)
     end
 
+    -- Hàm tạo Tab mới
     function WindowObj:CreateTab(TabName)
         local TabBtn = Instance.new("TextButton")
         TabBtn.Size = UDim2.new(1, 0, 0, 32)
@@ -380,12 +402,6 @@ function EmeraldField:CreateWindow(Config)
         FirstTab = false
         local TabObj = {}
 
-        function TabObj:SetElementOrder(elementInstance, orderNumber)
-            if elementInstance and elementInstance:IsA("GuiObject") then
-                elementInstance.LayoutOrder = orderNumber
-            end
-        end
-
         function TabObj:CreateSection(SectionTitle)
             local SecLabel = Instance.new("TextLabel")
             SecLabel.Size = UDim2.new(1, 0, 0, 22)
@@ -397,146 +413,6 @@ function EmeraldField:CreateWindow(Config)
             SecLabel.TextXAlignment = Enum.TextXAlignment.Left
             SecLabel.Parent = Page
             ApplyTextOutline(SecLabel, 1.1, 0.25)
-            return SecLabel
-        end
-
-        function TabObj:CreateParagraph(Cfg)
-            local Title = Cfg.Title or "Thông tin"
-            local Content = Cfg.Content or ""
-
-            local Frame = Instance.new("Frame")
-            Frame.Size = UDim2.new(1, 0, 0, 50)
-            Frame.BackgroundColor3 = Theme.Element
-            Frame.BackgroundTransparency = 0.3
-            Frame.AutomaticSize = Enum.AutomaticSize.Y
-            Frame.Parent = Page
-            AddCorner(Frame, 8)
-            AddBorder(Frame, Theme.Stroke, 0.55)
-
-            local UIWPadding = Instance.new("UIPadding")
-            UIWPadding.PaddingTop = UDim.new(0, 8)
-            UIWPadding.PaddingBottom = UDim.new(0, 8)
-            UIWPadding.PaddingLeft = UDim.new(0, 12)
-            UIWPadding.PaddingRight = UDim.new(0, 12)
-            UIWPadding.Parent = Frame
-
-            local UIWLayout = Instance.new("UIListLayout")
-            UIWLayout.Padding = UDim.new(0, 4)
-            UIWLayout.Parent = Frame
-
-            local TitleLab = Instance.new("TextLabel")
-            TitleLab.Size = UDim2.new(1, 0, 0, 18)
-            TitleLab.BackgroundTransparency = 1
-            TitleLab.Text = Title
-            TitleLab.Font = Enum.Font.GothamBold
-            TitleLab.TextSize = 13
-            TitleLab.TextColor3 = Theme.TextMain
-            TitleLab.TextXAlignment = Enum.TextXAlignment.Left
-            TitleLab.Parent = Frame
-            ApplyTextOutline(TitleLab, 1.1, 0.28)
-
-            local DescLab = Instance.new("TextLabel")
-            DescLab.Size = UDim2.new(1, 0, 0, 0)
-            DescLab.BackgroundTransparency = 1
-            DescLab.Text = Content
-            DescLab.Font = Enum.Font.Gotham
-            DescLab.TextSize = 11
-            DescLab.TextColor3 = Theme.TextSub
-            DescLab.TextWrapped = true
-            DescLab.AutomaticSize = Enum.AutomaticSize.Y
-            DescLab.TextXAlignment = Enum.TextXAlignment.Left
-            DescLab.Parent = Frame
-            ApplyTextOutline(DescLab, 1, 0.35)
-
-            return Frame
-        end
-
-        function TabObj:CreateImage(Cfg)
-            local ImageId = Cfg.Image or ""
-            local ImgHeight = Cfg.Height or 130
-
-            local Frame = Instance.new("Frame")
-            Frame.Size = UDim2.new(1, 0, 0, ImgHeight)
-            Frame.BackgroundColor3 = Theme.Element
-            Frame.BackgroundTransparency = 0.3
-            Frame.ClipsDescendants = true
-            Frame.Parent = Page
-            AddCorner(Frame, 8)
-            AddBorder(Frame, Theme.Stroke, 0.55)
-
-            local ImgLabel = Instance.new("ImageLabel")
-            ImgLabel.Size = UDim2.new(1, -12, 1, -12)
-            ImgLabel.Position = UDim2.new(0, 6, 0, 6)
-            ImgLabel.BackgroundTransparency = 1
-            ImgLabel.Image = ImageId
-            ImgLabel.ScaleType = Enum.ScaleType.Fit
-            ImgLabel.Parent = Frame
-            AddCorner(ImgLabel, 6)
-
-            return Frame
-        end
-
-        function TabObj:CreateInnerFrames(Cfg)
-            local Title1 = Cfg.Title1 or "Khung 1"
-            local Title2 = Cfg.Title2 or "Khung 2"
-
-            local MainContainer = Instance.new("Frame")
-            MainContainer.Size = UDim2.new(1, 0, 0, 160)
-            MainContainer.BackgroundTransparency = 1
-            MainContainer.Parent = Page
-
-            local Layout = Instance.new("UIListLayout")
-            Layout.FillDirection = Enum.FillDirection.Horizontal
-            Layout.HorizontalAlignment = Enum.HorizontalAlignment.SpaceBetween
-            Layout.SortOrder = Enum.SortOrder.LayoutOrder
-            Layout.Parent = MainContainer
-
-            local function BuildSubFrame(nameTitle)
-                local SubBox = Instance.new("ScrollingFrame")
-                SubBox.Size = UDim2.new(0.48, 0, 1, 0)
-                SubBox.BackgroundColor3 = Theme.Element
-                SubBox.BackgroundTransparency = 0.3
-                SubBox.ScrollBarThickness = 2
-                SubBox.ScrollBarImageColor3 = Theme.Accent
-                SubBox.CanvasSize = UDim2.new(0, 0, 0, 0)
-                SubBox.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                SubBox.Parent = MainContainer
-                AddCorner(SubBox, 8)
-                AddBorder(SubBox, Theme.Stroke, 0.55)
-
-                local Pad = Instance.new("UIPadding")
-                Pad.PaddingTop = UDim.new(0, 8)
-                Pad.PaddingBottom = UDim.new(0, 8)
-                Pad.PaddingLeft = UDim.new(0, 8)
-                Pad.PaddingRight = UDim.new(0, 8)
-                Pad.Parent = SubBox
-
-                local L = Instance.new("UIListLayout")
-                L.Padding = UDim.new(0, 6)
-                L.Parent = SubBox
-
-                local Header = Instance.new("TextLabel")
-                Header.Size = UDim2.new(1, 0, 0, 20)
-                Header.BackgroundTransparency = 1
-                Header.Text = nameTitle
-                Header.Font = Enum.Font.GothamBold
-                Header.TextSize = 12
-                Header.TextColor3 = Theme.AccentBright
-                Header.TextXAlignment = Enum.TextXAlignment.Left
-                Header.Parent = SubBox
-                ApplyTextOutline(Header, 1, 0.3)
-
-                return SubBox
-            end
-
-            local Frame1 = BuildSubFrame(Title1)
-            local Frame2 = BuildSubFrame(Title2)
-
-            return {
-                Frame1 = Frame1,
-                Frame2 = Frame2,
-                Container = MainContainer
-            }
         end
 
         function TabObj:CreateToggle(Cfg)
@@ -597,7 +473,6 @@ function EmeraldField:CreateWindow(Config)
             end)
 
             return {
-                Instance = Frame,
                 Set = function(_, val)
                     State = val
                     UpdateVisual()
@@ -664,14 +539,6 @@ function EmeraldField:CreateWindow(Config)
             Fill.Parent = Track
             AddCorner(Fill, 4)
 
-            local SliderKnob = Instance.new("Frame")
-            SliderKnob.Size = UDim2.new(0, 14, 0, 14)
-            SliderKnob.Position = UDim2.new(initPct, -7, 0.5, -7)
-            SliderKnob.BackgroundColor3 = Theme.TextMain
-            SliderKnob.Parent = Track
-            AddCorner(SliderKnob, 7)
-            AddBorder(SliderKnob, Theme.AccentBright, 0.2)
-
             local Sliding = false
             local function UpdateSlider(inputPos)
                 local pct = math.clamp((inputPos.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
@@ -679,9 +546,7 @@ function EmeraldField:CreateWindow(Config)
                 local stepped = math.floor(raw / Inc + 0.5) * Inc
                 Value = math.clamp(tonumber(string.format("%.2f", stepped)), Min, Max)
                 local finalPct = (Value - Min) / (Max - Min)
-                
                 Fill.Size = UDim2.new(finalPct, 0, 1, 0)
-                SliderKnob.Position = UDim2.new(finalPct, -7, 0.5, -7)
                 ValLabel.Text = tostring(Value) .. Suffix
                 Callback(Value)
             end
@@ -704,18 +569,6 @@ function EmeraldField:CreateWindow(Config)
                     Sliding = false
                 end
             end)
-
-            return {
-                Instance = Frame,
-                SetValue = function(_, val)
-                    Value = math.clamp(val, Min, Max)
-                    local p = (Value - Min) / (Max - Min)
-                    Fill.Size = UDim2.new(p, 0, 1, 0)
-                    SliderKnob.Position = UDim2.new(p, -7, 0.5, -7)
-                    ValLabel.Text = tostring(Value) .. Suffix
-                    Callback(Value)
-                end
-            }
         end
 
         function TabObj:CreateButton(Cfg)
@@ -763,9 +616,239 @@ function EmeraldField:CreateWindow(Config)
                 end)
                 Callback()
             end)
+        end
+
+        -- =====================================================================
+        -- TÍNH NĂNG MỚI 1: 2D IMAGE / ICON (Hiển thị ảnh 2D, Thumbnail, Logo)
+        -- =====================================================================
+        function TabObj:Create2DImage(Cfg)
+            local Name = Cfg.Name or "Hình ảnh 2D"
+            local ImageId = Cfg.Image or "rbxassetid://0"
+            local Height = Cfg.Height or 120
+
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, Height + 36)
+            Frame.BackgroundColor3 = Theme.Element
+            Frame.BackgroundTransparency = 0.25
+            Frame.Parent = Page
+            AddCorner(Frame, 8)
+            AddBorder(Frame, Theme.Stroke, 0.55)
+
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(1, -20, 0, 28)
+            Label.Position = UDim2.new(0, 12, 0, 4)
+            Label.BackgroundTransparency = 1
+            Label.Text = Name
+            Label.Font = Enum.Font.GothamBold
+            Label.TextSize = 13
+            Label.TextColor3 = Theme.TextMain
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = Frame
+            ApplyTextOutline(Label, 1.1, 0.28)
+
+            local ImgBox = Instance.new("ImageLabel")
+            ImgBox.Size = UDim2.new(1, -16, 0, Height)
+            ImgBox.Position = UDim2.new(0, 8, 0, 32)
+            ImgBox.BackgroundColor3 = Color3.fromRGB(6, 20, 14)
+            ImgBox.BackgroundTransparency = 0.3
+            ImgBox.Image = ImageId
+            ImgBox.ScaleType = Enum.ScaleType.Fit
+            ImgBox.Parent = Frame
+            AddCorner(ImgBox, 6)
+            AddBorder(ImgBox, Theme.Stroke, 0.4)
 
             return {
-                Instance = Btn
+                SetImage = function(_, newId)
+                    ImgBox.Image = tostring(newId)
+                end
+            }
+        end
+
+        -- =====================================================================
+        -- TÍNH NĂNG MỚI 2: PARAGRAPH (Khung thông tin/ghi chú tiêu đề + nội dung)
+        -- =====================================================================
+        function TabObj:CreateParagraph(Cfg)
+            local Title = Cfg.Title or "Tiêu đề ghi chú"
+            local Content = Cfg.Content or "Nội dung chi tiết ở đây..."
+
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, 60)
+            Frame.BackgroundColor3 = Theme.Element
+            Frame.BackgroundTransparency = 0.25
+            Frame.Parent = Page
+            AddCorner(Frame, 8)
+            AddBorder(Frame, Theme.Stroke, 0.55)
+
+            local TitleLab = Instance.new("TextLabel")
+            TitleLab.Size = UDim2.new(1, -24, 0, 20)
+            TitleLab.Position = UDim2.new(0, 12, 0, 6)
+            TitleLab.BackgroundTransparency = 1
+            TitleLab.Text = Title
+            TitleLab.Font = Enum.Font.GothamBold
+            TitleLab.TextSize = 13
+            TitleLab.TextColor3 = Theme.AccentBright
+            TitleLab.TextXAlignment = Enum.TextXAlignment.Left
+            TitleLab.Parent = Frame
+            ApplyTextOutline(TitleLab, 1.1, 0.25)
+
+            local ContentLab = Instance.new("TextLabel")
+            ContentLab.Size = UDim2.new(1, -24, 0, 0)
+            ContentLab.Position = UDim2.new(0, 12, 0, 28)
+            ContentLab.BackgroundTransparency = 1
+            ContentLab.Text = Content
+            ContentLab.Font = Enum.Font.Gotham
+            ContentLab.TextSize = 11
+            ContentLab.TextColor3 = Theme.TextSub
+            ContentLab.TextWrapped = true
+            ContentLab.AutomaticSize = Enum.AutomaticSize.Y
+            ContentLab.TextXAlignment = Enum.TextXAlignment.Left
+            ContentLab.TextYAlignment = Enum.TextYAlignment.Top
+            ContentLab.Parent = Frame
+            ApplyTextOutline(ContentLab, 1, 0.35)
+
+            -- Tự động tăng chiều cao khung theo độ dài chữ
+            task.spawn(function()
+                task.wait()
+                Frame.Size = UDim2.new(1, 0, 0, ContentLab.AbsoluteSize.Y + 36)
+            end)
+
+            return {
+                SetDesc = function(_, newText)
+                    ContentLab.Text = tostring(newText)
+                    task.wait()
+                    Frame.Size = UDim2.new(1, 0, 0, ContentLab.AbsoluteSize.Y + 36)
+                end
+            }
+        end
+
+        -- =====================================================================
+        -- 3D VIEWPORT (Hiển thị Model / Pet / Item 3D)
+        -- =====================================================================
+        function TabObj:Create3DView(Cfg)
+            local Name = Cfg.Name or "3D Viewport Item"
+            local Model = Cfg.Model
+            local AutoRotate = Cfg.AutoRotate ~= false
+            local Height = Cfg.Height or 120
+
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, Height + 36)
+            Frame.BackgroundColor3 = Theme.Element
+            Frame.BackgroundTransparency = 0.25
+            Frame.Parent = Page
+            AddCorner(Frame, 8)
+            AddBorder(Frame, Theme.Stroke, 0.55)
+
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(1, -20, 0, 28)
+            Label.Position = UDim2.new(0, 12, 0, 4)
+            Label.BackgroundTransparency = 1
+            Label.Text = Name
+            Label.Font = Enum.Font.GothamBold
+            Label.TextSize = 13
+            Label.TextColor3 = Theme.TextMain
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = Frame
+            ApplyTextOutline(Label, 1.1, 0.28)
+
+            local Viewport = Instance.new("ViewportFrame")
+            Viewport.Size = UDim2.new(1, -16, 0, Height)
+            Viewport.Position = UDim2.new(0, 8, 0, 32)
+            Viewport.BackgroundColor3 = Color3.fromRGB(6, 20, 14)
+            Viewport.BackgroundTransparency = 0.3
+            Viewport.Parent = Frame
+            AddCorner(Viewport, 6)
+            AddBorder(Viewport, Theme.Stroke, 0.4)
+
+            local light = Instance.new("DirectionalLight")
+            light.Color = Color3.fromRGB(255, 255, 255)
+            light.Parent = Viewport
+
+            local camera = Instance.new("Camera")
+            Viewport.CurrentCamera = camera
+            camera.Parent = Viewport
+
+            if Model and Model:IsA("Model") then
+                local cloneModel = Model:Clone()
+                cloneModel.Parent = Viewport
+
+                local cf, size = cloneModel:GetBoundingBox()
+                local maxDim = math.max(size.X, size.Y, size.Z)
+                local distance = maxDim * 2.2
+
+                camera.CFrame = CFrame.new(cf.Position + Vector3.new(distance, distance * 0.6, distance), cf.Position)
+
+                if AutoRotate then
+                    task.spawn(function()
+                        local angle = 0
+                        while cloneModel and cloneModel.Parent do
+                            angle = angle + 0.015
+                            local offset = CFrame.Angles(0, angle, 0) * Vector3.new(distance, distance * 0.6, distance)
+                            camera.CFrame = CFrame.new(cf.Position + offset, cf.Position)
+                            task.wait(0.03)
+                        end
+                    end)
+                end
+            end
+        end
+
+        -- =====================================================================
+        -- SCROLLING TEXT BOX (Khung cuộn chứa văn bản dài)
+        -- =====================================================================
+        function TabObj:CreateScrollingBox(Cfg)
+            local Name = Cfg.Name or "Thông tin / Hướng dẫn"
+            local ContentText = Cfg.Content or "Chưa có nội dung..."
+            local Height = Cfg.Height or 100
+
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(1, 0, 0, Height + 36)
+            Frame.BackgroundColor3 = Theme.Element
+            Frame.BackgroundTransparency = 0.25
+            Frame.Parent = Page
+            AddCorner(Frame, 8)
+            AddBorder(Frame, Theme.Stroke, 0.55)
+
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(1, -20, 0, 28)
+            Label.Position = UDim2.new(0, 12, 0, 4)
+            Label.BackgroundTransparency = 1
+            Label.Text = Name
+            Label.Font = Enum.Font.GothamBold
+            Label.TextSize = 13
+            Label.TextColor3 = Theme.TextMain
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = Frame
+            ApplyTextOutline(Label, 1.1, 0.28)
+
+            local ScrollBox = Instance.new("ScrollingFrame")
+            ScrollBox.Size = UDim2.new(1, -16, 0, Height)
+            ScrollBox.Position = UDim2.new(0, 8, 0, 32)
+            ScrollBox.BackgroundTransparency = 1
+            ScrollBox.BorderSizePixel = 0
+            ScrollBox.ScrollBarThickness = 3
+            ScrollBox.ScrollBarImageColor3 = Theme.Accent
+            ScrollBox.CanvasSize = UDim2.new(0, 0, 0, 0)
+            ScrollBox.AutomaticCanvasSize = Enum.AutomaticSize.Y
+            ScrollBox.Parent = Frame
+
+            local TextContent = Instance.new("TextLabel")
+            TextContent.Size = UDim2.new(1, -10, 0, 0)
+            TextContent.Position = UDim2.new(0, 5, 0, 5)
+            TextContent.BackgroundTransparency = 1
+            TextContent.Text = ContentText
+            TextContent.Font = Enum.Font.Gotham
+            TextContent.TextSize = 12
+            TextContent.TextColor3 = Theme.TextSub
+            TextContent.TextWrapped = true
+            TextContent.AutomaticSize = Enum.AutomaticSize.Y
+            TextContent.TextXAlignment = Enum.TextXAlignment.Left
+            TextContent.TextYAlignment = Enum.TextYAlignment.Top
+            TextContent.Parent = ScrollBox
+            ApplyTextOutline(TextContent, 1, 0.35)
+
+            return {
+                SetText = function(_, newText)
+                    TextContent.Text = tostring(newText)
+                end
             }
         end
 
@@ -813,8 +896,6 @@ function EmeraldField:CreateWindow(Config)
             Box.FocusLost:Connect(function()
                 Callback(Box.Text)
             end)
-
-            return { Instance = Frame }
         end
 
         function TabObj:CreateDropdown(Cfg)
@@ -901,8 +982,6 @@ function EmeraldField:CreateWindow(Config)
                 SelectedLabel.Text = tostring(Current) .. (Open and "  ▲" or "  ▼")
                 TweenService:Create(Container, TweenInfo.new(0.18), {Size = UDim2.new(1, 0, 0, targetH)}):Play()
             end)
-
-            return { Instance = Container }
         end
 
         function TabObj:CreateKeybind(Cfg)
@@ -958,8 +1037,6 @@ function EmeraldField:CreateWindow(Config)
                     Callback(CurrentKey)
                 end
             end)
-
-            return { Instance = Frame }
         end
 
         function TabObj:CreateColorPicker(Cfg)
@@ -989,7 +1066,7 @@ function EmeraldField:CreateWindow(Config)
             Label.Size = UDim2.new(1, -60, 1, 0)
             Label.Position = UDim2.new(0, 12, 0, 0)
             Label.BackgroundTransparency = 1
-            Label.Text = Name
+            Label.Text = Name .. " (Bấm đổi màu)"
             Label.Font = Enum.Font.GothamMedium
             Label.TextSize = 13
             Label.TextColor3 = Theme.TextMain
@@ -1010,178 +1087,6 @@ function EmeraldField:CreateWindow(Config)
                 Preview.BackgroundColor3 = Colors[idx]
                 Callback(Colors[idx])
             end)
-
-            return { Instance = Frame }
-        end
-
-        function TabObj:CreateProgressBar(Cfg)
-            local Name = Cfg.Name or "Progress"
-            local MaxValue = Cfg.Max or 100
-            local CurrentValue = Cfg.Value or 0
-
-            local Frame = Instance.new("Frame")
-            Frame.Size = UDim2.new(1, 0, 0, 48)
-            Frame.BackgroundColor3 = Theme.Element
-            Frame.BackgroundTransparency = 0.25
-            Frame.Parent = Page
-            AddCorner(Frame, 8)
-            AddBorder(Frame, Theme.Stroke, 0.55)
-
-            local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, -90, 0, 20)
-            Label.Position = UDim2.new(0, 12, 0, 4)
-            Label.BackgroundTransparency = 1
-            Label.Text = Name
-            Label.Font = Enum.Font.GothamMedium
-            Label.TextSize = 13
-            Label.TextColor3 = Theme.TextMain
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            Label.Parent = Frame
-            ApplyTextOutline(Label, 1.1, 0.28)
-
-            local ValLabel = Instance.new("TextLabel")
-            ValLabel.Size = UDim2.new(0, 75, 0, 20)
-            ValLabel.Position = UDim2.new(1, -87, 0, 4)
-            ValLabel.BackgroundTransparency = 1
-            ValLabel.Text = tostring(CurrentValue) .. "/" .. tostring(MaxValue)
-            ValLabel.Font = Enum.Font.GothamBold
-            ValLabel.TextSize = 11
-            ValLabel.TextColor3 = Theme.AccentBright
-            ValLabel.TextXAlignment = Enum.TextXAlignment.Right
-            ValLabel.Parent = Frame
-            ApplyTextOutline(ValLabel, 1.1, 0.25)
-
-            local Track = Instance.new("Frame")
-            Track.Size = UDim2.new(1, -24, 0, 8)
-            Track.Position = UDim2.new(0, 12, 0, 30)
-            Track.BackgroundColor3 = Color3.fromRGB(8, 24, 17)
-            Track.Parent = Frame
-            AddCorner(Track, 4)
-
-            local Fill = Instance.new("Frame")
-            local initPct = math.clamp(CurrentValue / MaxValue, 0, 1)
-            Fill.Size = UDim2.new(initPct, 0, 1, 0)
-            Fill.BackgroundColor3 = Theme.Accent
-            Fill.BorderSizePixel = 0
-            Fill.Parent = Track
-            AddCorner(Fill, 4)
-
-            return {
-                Instance = Frame,
-                SetValue = function(_, val, maxVal)
-                    MaxValue = maxVal or MaxValue
-                    CurrentValue = math.clamp(val, 0, MaxValue)
-                    local p = math.clamp(CurrentValue / MaxValue, 0, 1)
-                    Fill.Size = UDim2.new(p, 0, 1, 0)
-                    ValLabel.Text = tostring(CurrentValue) .. "/" .. tostring(MaxValue)
-                end
-            }
-        end
-
-        function TabObj:CreateBadge(Cfg)
-            local Text = Cfg.Text or "Badge Status"
-            local Color = Cfg.Color or Theme.Accent
-
-            local Frame = Instance.new("Frame")
-            Frame.Size = UDim2.new(1, 0, 0, 30)
-            Frame.BackgroundColor3 = Theme.Element
-            Frame.BackgroundTransparency = 0.4
-            Frame.Parent = Page
-            AddCorner(Frame, 6)
-            AddBorder(Frame, Theme.Stroke, 0.6)
-
-            local Indicator = Instance.new("Frame")
-            Indicator.Size = UDim2.new(0, 10, 0, 10)
-            Indicator.Position = UDim2.new(0, 10, 0.5, -5)
-            Indicator.BackgroundColor3 = Color
-            Indicator.Parent = Frame
-            AddCorner(Indicator, 5)
-
-            local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, -30, 1, 0)
-            Label.Position = UDim2.new(0, 28, 0, 0)
-            Label.BackgroundTransparency = 1
-            Label.Text = Text
-            Label.Font = Enum.Font.GothamMedium
-            Label.TextSize = 12
-            Label.TextColor3 = Theme.TextMain
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            Label.Parent = Frame
-            ApplyTextOutline(Label, 1, 0.3)
-
-            return {
-                Instance = Frame,
-                SetText = function(_, t) Label.Text = t end,
-                SetColor = function(_, c) Indicator.BackgroundColor3 = c end
-            }
-        end
-
-        function TabObj:CreateAccordion(Cfg)
-            local Title = Cfg.Title or "Accordion Menu"
-            local Open = false
-
-            local Container = Instance.new("Frame")
-            Container.Size = UDim2.new(1, 0, 0, 38)
-            Container.BackgroundColor3 = Theme.Element
-            Container.BackgroundTransparency = 0.25
-            Container.ClipsDescendants = true
-            Container.Parent = Page
-            AddCorner(Container, 8)
-            AddBorder(Container, Theme.Stroke, 0.55)
-
-            local Header = Instance.new("TextButton")
-            Header.Size = UDim2.new(1, 0, 0, 38)
-            Header.BackgroundTransparency = 1
-            Header.Text = ""
-            Header.Parent = Container
-
-            local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, -30, 1, 0)
-            Label.Position = UDim2.new(0, 12, 0, 0)
-            Label.BackgroundTransparency = 1
-            Label.Text = Title
-            Label.Font = Enum.Font.GothamMedium
-            Label.TextSize = 13
-            Label.TextColor3 = Theme.TextMain
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            Label.Parent = Header
-            ApplyTextOutline(Label, 1.1, 0.28)
-
-            local Arrow = Instance.new("TextLabel")
-            Arrow.Size = UDim2.new(0, 20, 0, 20)
-            Arrow.Position = UDim2.new(1, -26, 0.5, -10)
-            Arrow.BackgroundTransparency = 1
-            Arrow.Text = "▼"
-            Arrow.Font = Enum.Font.GothamBold
-            Arrow.TextSize = 12
-            Arrow.TextColor3 = Theme.AccentBright
-            Arrow.Parent = Header
-
-            local ContentHolder = Instance.new("ScrollingFrame")
-            ContentHolder.Size = UDim2.new(1, -16, 0, 100)
-            ContentHolder.Position = UDim2.new(0, 8, 0, 42)
-            ContentHolder.BackgroundTransparency = 1
-            ContentHolder.ScrollBarThickness = 2
-            ContentHolder.ScrollBarImageColor3 = Theme.Accent
-            ContentHolder.CanvasSize = UDim2.new(0, 0, 0, 0)
-            ContentHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
-            ContentHolder.Parent = Container
-
-            local ContentLayout = Instance.new("UIListLayout")
-            ContentLayout.Padding = UDim.new(0, 6)
-            ContentLayout.Parent = ContentHolder
-
-            Header.MouseButton1Click:Connect(function()
-                Open = not Open
-                Arrow.Text = Open and "▲" or "▼"
-                local targetH = Open and 146 or 38
-                TweenService:Create(Container, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, targetH)}):Play()
-            end)
-
-            return {
-                Instance = Container,
-                Content = ContentHolder
-            }
         end
 
         return TabObj
