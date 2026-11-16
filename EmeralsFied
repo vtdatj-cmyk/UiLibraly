@@ -1,5 +1,5 @@
 --[[
-    EmeraldField UI Library (Rayfield Inspired) + Fixed LayoutOrder & Dropdown Support
+    EmeraldField UI Library (Rayfield Inspired) + Fixed LayoutOrder for element reordering
     Theme: Emerald & Soft Dark Green Gradient + Soft Black Text Stroke
 ]]
 
@@ -363,7 +363,7 @@ function EmeraldField:CreateWindow(Config)
 
         local PageLayout = Instance.new("UIListLayout")
         PageLayout.Padding = UDim.new(0, 4)
-        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder -- Hỗ trợ sắp xếp vị trí qua LayoutOrder
         PageLayout.Parent = Page
 
         table.insert(AllTabs, {Btn = TabBtn, Stroke = btnStroke, Page = Page})
@@ -771,167 +771,6 @@ function EmeraldField:CreateWindow(Config)
             Box.FocusLost:Connect(function()
                 Callback(Box.Text)
             end)
-        end
-
-        function TabObj:CreateDropdown(Cfg)
-            local Name = Cfg.Name or "Dropdown"
-            local Options = Cfg.Options or {}
-            local Current = Cfg.CurrentValue or Options[1] or ""
-            local Callback = Cfg.Callback or function() end
-            local order = Cfg.LayoutOrder or 1
-
-            local Container = Instance.new("Frame")
-            Container.Size = UDim2.new(1, 0, 0, 36)
-            Container.BackgroundColor3 = Theme.Element
-            Container.BackgroundTransparency = 0.25
-            Container.ClipsDescendants = true
-            Container.LayoutOrder = order
-            Container.Parent = Page
-            AddCorner(Container, 6)
-            AddBorder(Container, Theme.Stroke, 0.55)
-
-            local HeaderBtn = Instance.new("TextButton")
-            HeaderBtn.Size = UDim2.new(1, 0, 0, 36)
-            HeaderBtn.BackgroundTransparency = 1
-            HeaderBtn.Text = ""
-            HeaderBtn.Parent = Container
-
-            local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(0.5, -10, 1, 0)
-            Label.Position = UDim2.new(0, 10, 0, 0)
-            Label.BackgroundTransparency = 1
-            Label.Text = Name
-            Label.Font = Enum.Font.GothamMedium
-            Label.TextSize = 12
-            Label.TextColor3 = Theme.TextMain
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            Label.Parent = HeaderBtn
-            ApplyTextOutline(Label, 1.1, 0.28)
-
-            local ValBox = Instance.new("Frame")
-            ValBox.Size = UDim2.new(0.5, -14, 0, 24)
-            ValBox.Position = UDim2.new(0.5, 4, 0.5, -12)
-            ValBox.BackgroundColor3 = Color3.fromRGB(8, 25, 17)
-            ValBox.Parent = HeaderBtn
-            AddCorner(ValBox, 5)
-            AddBorder(ValBox, Theme.Stroke, 0.5)
-
-            local ValLabel = Instance.new("TextLabel")
-            ValLabel.Size = UDim2.new(1, -24, 1, 0)
-            ValLabel.Position = UDim2.new(0, 8, 0, 0)
-            ValLabel.BackgroundTransparency = 1
-            ValLabel.Text = tostring(Current)
-            ValLabel.Font = Enum.Font.GothamBold
-            ValLabel.TextSize = 11
-            ValLabel.TextColor3 = Theme.AccentBright
-            ValLabel.TextXAlignment = Enum.TextXAlignment.Left
-            ValLabel.TextTruncate = Enum.TextTruncate.AtEnd
-            ValLabel.Parent = ValBox
-            ApplyTextOutline(ValLabel, 1, 0.35)
-
-            local Arrow = Instance.new("TextLabel")
-            Arrow.Size = UDim2.new(0, 16, 1, 0)
-            Arrow.Position = UDim2.new(1, -18, 0, 0)
-            Arrow.BackgroundTransparency = 1
-            Arrow.Text = "▼"
-            Arrow.Font = Enum.Font.GothamBold
-            Arrow.TextSize = 9
-            Arrow.TextColor3 = Theme.TextSub
-            Arrow.Parent = ValBox
-
-            local ListHolder = Instance.new("ScrollingFrame")
-            ListHolder.Size = UDim2.new(1, -12, 0, 0)
-            ListHolder.Position = UDim2.new(0, 6, 0, 38)
-            ListHolder.BackgroundColor3 = Color3.fromRGB(7, 22, 15)
-            ListHolder.BackgroundTransparency = 0.2
-            ListHolder.BorderSizePixel = 0
-            ListHolder.ScrollBarThickness = 2
-            ListHolder.ScrollBarImageColor3 = Theme.Accent
-            ListHolder.AutomaticCanvasSize = Enum.AutomaticSize.Y
-            ListHolder.CanvasSize = UDim2.new(0, 0, 0, 0)
-            ListHolder.Parent = Container
-            AddCorner(ListHolder, 5)
-
-            local ListPadding = Instance.new("UIPadding")
-            ListPadding.PaddingTop = UDim.new(0, 4)
-            ListPadding.PaddingBottom = UDim.new(0, 4)
-            ListPadding.PaddingLeft = UDim.new(0, 4)
-            ListPadding.PaddingRight = UDim.new(0, 4)
-            ListPadding.Parent = ListHolder
-
-            local ListLayout = Instance.new("UIListLayout")
-            ListLayout.Padding = UDim.new(0, 3)
-            ListLayout.Parent = ListHolder
-
-            local isOpen = false
-
-            local function ToggleDropdown(state)
-                isOpen = state
-                local itemCount = #Options
-                local listHeight = math.min(itemCount * 27 + 8, 125)
-                local totalHeight = isOpen and (42 + listHeight) or 36
-
-                Arrow.Text = isOpen and "▲" or "▼"
-                TweenService:Create(Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(1, 0, 0, totalHeight)
-                }):Play()
-                TweenService:Create(ListHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(1, -12, 0, isOpen and listHeight or 0)
-                }):Play()
-            end
-
-            HeaderBtn.MouseButton1Click:Connect(function()
-                ToggleDropdown(not isOpen)
-            end)
-
-            local function RefreshOptions(newOptions)
-                for _, child in ipairs(ListHolder:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        child:Destroy()
-                    end
-                end
-                Options = newOptions or {}
-                for _, opt in ipairs(Options) do
-                    local OptBtn = Instance.new("TextButton")
-                    OptBtn.Size = UDim2.new(1, 0, 0, 24)
-                    OptBtn.BackgroundColor3 = (opt == Current) and Theme.BgLight or Theme.Element
-                    OptBtn.BackgroundTransparency = 0.2
-                    OptBtn.Text = "  " .. tostring(opt)
-                    OptBtn.Font = Enum.Font.GothamSemibold
-                    OptBtn.TextSize = 11
-                    OptBtn.TextColor3 = (opt == Current) and Theme.AccentBright or Theme.TextMain
-                    OptBtn.TextXAlignment = Enum.TextXAlignment.Left
-                    OptBtn.Parent = ListHolder
-                    AddCorner(OptBtn, 4)
-                    ApplyTextOutline(OptBtn, 1, 0.35)
-
-                    OptBtn.MouseButton1Click:Connect(function()
-                        Current = opt
-                        ValLabel.Text = tostring(opt)
-                        RefreshOptions(Options)
-                        ToggleDropdown(false)
-                        Callback(opt)
-                    end)
-                end
-            end
-
-            RefreshOptions(Options)
-
-            return {
-                Set = function(_, val)
-                    Current = val
-                    ValLabel.Text = tostring(val)
-                    RefreshOptions(Options)
-                    Callback(val)
-                end,
-                Refresh = function(_, newOpts, keepCurrent)
-                    if not keepCurrent then
-                        Current = newOpts[1] or ""
-                        ValLabel.Text = tostring(Current)
-                    end
-                    RefreshOptions(newOpts)
-                end
-            }
         end
 
         return TabObj
